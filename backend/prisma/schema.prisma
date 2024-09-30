@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Employee {
+  emp_id          String    @id @unique // Primary Key
+  email           String    @unique
+  emp_name        String
+  designation     Designation // Enum
+  performance_rating Float?
+
+  // Foreign key relation to User
+  user            User       @relation(fields: [emp_id], references: [user_id])
+
+  // Relationships
+  CourseEnrollment CourseEnrollment[]
+}
+
+model Course {
+  course_id       Int       @id @default(autoincrement()) // Primary Key
+  course_name     String
+  duration        String
+  difficulty_level String
+  course_img_url  String
+
+  // Relationships
+  CourseEnrollment CourseEnrollment[]
+}
+
+model CourseEnrollment {
+  enroll_id                  Int       @id @default(autoincrement()) // Primary Key
+  emp_id                     String    // Foreign key reference to Employee
+  course_id                  Int       // Foreign key reference to Course
+  course_completion_rate     Int
+  course_certificate_approved Boolean
+
+  // Relationships
+  employee       Employee  @relation(fields: [emp_id], references: [emp_id])
+  course         Course    @relation(fields: [course_id], references: [course_id])
+
+  @@unique([emp_id, course_id]) // Composite unique key to prevent duplicate enrollments
+}
+
+model User {
+  user_id        String     @id @unique  // Primary Key
+  password       String
+  role           Role      @default(EMPLOYEE) // Default role is EMPLOYEE //ENUM
+
+  // Relationship to Employee
+  Employee       Employee[]
+}
+
+// Enums for predefined sets of values
+enum Designation {
+  SOFTWARE_ENGINEER
+  SR_SOFTWARE_ENGINEER
+  SOLUTION_ENABLER
+  SOLUTION_CONSULTANT
+  TECHNOLOGY_SOLUTION_ARCHITECT
+  PRINCIPAL_SOLUTION_ARCHITECT
+}
+
+enum Role {
+  ADMIN
+  EMPLOYEE
+}

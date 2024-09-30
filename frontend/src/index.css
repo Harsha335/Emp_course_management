@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --color-primary-light: #1E90FF;
+    --color-primary: #006bdd;
+
+    --color-secondary-light: #F0F0F0;
+    --color-secondary: #D3D3D3;
+
+    /* for text */
+    --color-accent-light: #2C3E50;
+    --color-accent: #34495E;
+
+    /* For notifications */
+    --color-success-light: #28A745;
+    --color-success: #2ECC71;
+
+    --color-warning-light: #FFC107;
+    --color-warning: #F1C40F;
+    
+    --color-error-light: #DC3545;
+    --color-error: #E74C3C;
+}
+
+/* Apply these variables in custom styles if needed */
+body {
+    background-color: var(--color-secondary-light);
+    color: var(--color-accent);
+}

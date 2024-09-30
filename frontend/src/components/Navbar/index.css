@@ -1,0 +1,24 @@
+#side-nav {
+    background: var(--color-primary);
+    width: inherit !important;
+    padding-top: 20px;
+}
+#side-nav a {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    display: block;
+}
+#side-nav a:hover {
+    color: #f3cbcb;
+}
+
+.nav-item{
+    background-color: var(--color-primary-light);
+    padding: 0.5rem;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    text-decoration: none;
+}
