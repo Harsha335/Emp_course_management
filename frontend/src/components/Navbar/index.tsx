@@ -1,10 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import './index.css'
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import AssignmentIcon from '@mui/icons-material/Assignment';
+import { decryptText } from '../../helper_functions/encrypt_decrypt';
+import { adminNavbarComponents, employeeNavbarComponents } from '../../helper_functions/navbar_elements';
 
 export const Navbar = () => {
     const navigate = useNavigate();
+    const role = decryptText(sessionStorage.getItem('role'));
+    const navComponents = role === 'ADMIN' ? adminNavbarComponents : employeeNavbarComponents;
     const handleLogout = () => {
         sessionStorage.removeItem('authToken');
         navigate('/login');
@@ -15,18 +17,24 @@ export const Navbar = () => {
                 <span className="flex flex-col gap-20 text-white">
                     {/* E-commerce logo */}
                     <span className='flex items-center justify-center'>
-                        <span className='text-xl font-semibold'>Task Management System</span>
+                        <span className='text-xl font-semibold'>{navComponents.title}</span>
                     </span>
                     {/* Navigation links */}
                     <span className="flex gap-8 flex-col">
-                        <a className="nav-item" href="/">
-                            <span className='mr-2'><DashboardIcon/></span>
-                            Dashboard
-                        </a>
-                        <a className="nav-item" href="/projects">
+                        {
+                            navComponents.routes.map((route) => {
+                                const Icon = route.icons;
+                                return (
+                                <a className="nav-item" href={`${route.url}`}>
+                                    <span className='mr-2'>{<Icon/>}</span>
+                                    {`${route.name}`}
+                                </a>)
+                            })
+                        }
+                        {/* <a className="nav-item" href="/projects">
                             <span className='mr-2'><AssignmentIcon/></span>
                             Projects
-                        </a>
+                        </a> */}
                     </span>
                 </span>
                 {/* User details and logout */}

@@ -1,6 +1,10 @@
+
+
 const EmployeeDashboard = () => {
     return (
-      <div>EmployeeDashboard</div>
+      <>
+        Employee Dashboard
+      </>
     )
   }
   
