@@ -47,9 +47,10 @@ export const signUpAdmin = async (req: Request, res: Response) => {
       data: {
         user_id,
         password: hashedPassword,
+        role: 'ADMIN'
       },
     });
-
+    console.log(newUser);
     res.status(201).json(newUser);
   } catch (error) {
     console.log("Error at signUpAdmin: ", error)
@@ -80,7 +81,7 @@ export const signUpEmployee = async (req: Request, res: Response) => {
         designation
       }
     });
-
+    console.log(newUser, newEmp);
     res.status(201).json(newEmp);
   } catch (error) {
     console.log("Error at signUp: ", error)

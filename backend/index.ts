@@ -16,7 +16,7 @@ app.use(cors(corsOptions));
 app.use(express.json())
 
 app.use("/api", authRouter);
-app.use("/api/user", userRouter);
+app.use("/api/users", userRouter);
 
 app.listen(process.env.SERVER_PORT, () => {
     console.log(`Server is running on localhost:${process.env.SERVER_PORT}`)

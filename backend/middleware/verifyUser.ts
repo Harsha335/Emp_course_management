@@ -6,11 +6,11 @@ interface JwtPayload {
   // Add other fields if necessary
 }
 interface CustomRequest extends Request {
-    user?: JwtPayload;
+  user?: JwtPayload;
 }
 
 export const verifyUser = (req: CustomRequest, res: Response, next: NextFunction) => {
-    console.log("verifyUser....")
+  console.log("verifyUser....");
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Authorization header is missing or malformed' });
