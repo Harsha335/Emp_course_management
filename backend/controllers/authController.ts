@@ -28,7 +28,7 @@ export const signInUser = async (req: Request, res: Response) => {
     // Generate JWT token
     const token = generateToken(user.user_id);
 
-    res.status(200).json({ token });
+    res.status(200).json({role: user.role, token });
   } catch (error) {
     console.log(error)
     res.status(500).json({ error: 'Error signing in' });
