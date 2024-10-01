@@ -8,12 +8,12 @@ export const adminNavbarComponents = {
         },
         {
             name: 'All Courses',
-            icons: (await import('@mui/icons-material/Assignment')).default,
+            icons: (await import('@mui/icons-material/Apps')).default,
             url: '/admin/allCourses',
         },
         {
             name: 'Add Course',
-            icons: (await import('@mui/icons-material/Assignment')).default,
+            icons: (await import('@mui/icons-material/NoteAdd')).default,
             url: '/admin/addCourse',
         },
         {

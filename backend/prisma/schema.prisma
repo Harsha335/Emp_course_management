@@ -28,14 +28,24 @@ model Employee {
 }
 
 model Course {
-  course_id       Int       @id @default(autoincrement()) // Primary Key
-  course_name     String
-  duration        String
-  difficulty_level String
-  course_img_url  String
+  course_id        Int                 @id @default(autoincrement()) // Primary Key
+  course_name      String
+  description      String              // Added field
+  duration         String
+  difficulty_level DifficultyLevel      // Changed to enum
+  course_img_url   String
+  tags              String[]
 
   // Relationships
   CourseEnrollment CourseEnrollment[]
+}
+
+// Enum for difficulty level
+enum DifficultyLevel {
+  BASIC
+  BEGINNER
+  INTERMEDIATE
+  EXPERT
 }
 
 model CourseEnrollment {

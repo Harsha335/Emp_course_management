@@ -25,10 +25,11 @@ export const Navbar = () => {
                             navComponents.routes.map((route) => {
                                 const Icon = route.icons;
                                 return (
-                                <a className="nav-item" href={`${route.url}`}>
-                                    <span className='mr-2'>{<Icon/>}</span>
-                                    {`${route.name}`}
-                                </a>)
+                                    <a className="nav-item" href={`${route.url}`}>
+                                        <span className='mr-2'>{<Icon/>}</span>
+                                        {`${route.name}`}
+                                    </a>
+                                )
                             })
                         }
                         {/* <a className="nav-item" href="/projects">

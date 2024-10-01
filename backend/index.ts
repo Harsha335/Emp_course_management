@@ -3,6 +3,7 @@ const cors = require('cors');
 require('dotenv').config();
 import authRouter from './routes/authRouter'
 import userRouter from './routes/userRouter'
+import courseRouter from './routes/courseRouter'
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(express.json())
 
 app.use("/api", authRouter);
 app.use("/api/users", userRouter);
+app.use("/api/courses", courseRouter);
 
 app.listen(process.env.SERVER_PORT, () => {
     console.log(`Server is running on localhost:${process.env.SERVER_PORT}`)
