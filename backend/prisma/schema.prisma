@@ -21,7 +21,7 @@ model Employee {
   performance_rating Float?
 
   // Foreign key relation to User
-  user            User       @relation(fields: [emp_id], references: [user_id])
+  user            User       @relation(fields: [emp_id], references: [user_id], onDelete: Cascade)
 
   // Relationships
   CourseEnrollment CourseEnrollment[]
@@ -49,17 +49,17 @@ enum DifficultyLevel {
 }
 
 model CourseEnrollment {
-  enroll_id                  Int       @id @default(autoincrement()) // Primary Key
-  emp_id                     String    // Foreign key reference to Employee
-  course_id                  Int       // Foreign key reference to Course
-  course_completion_rate     Int
-  course_certificate_approved Boolean
-
+  enroll_id                  Int      @id @default(autoincrement())  // Primary Key
+  emp_id                     String                                   // Foreign key reference to Employee
+  course_id                  Int                                      // Foreign key reference to Course
+  course_completion_rate      Int?                                    // Optional completion rate
+  course_certificate_approved Boolean?                               // Optional certificate approval status
+  
   // Relationships
-  employee       Employee  @relation(fields: [emp_id], references: [emp_id])
-  course         Course    @relation(fields: [course_id], references: [course_id])
+  employee                   Employee  @relation(fields: [emp_id], references: [emp_id], onDelete: Cascade)
+  course                     Course    @relation(fields: [course_id], references: [course_id], onDelete: Cascade)
 
-  @@unique([emp_id, course_id]) // Composite unique key to prevent duplicate enrollments
+  @@unique([emp_id, course_id])                                       // Prevent duplicate enrollments
 }
 
 model User {

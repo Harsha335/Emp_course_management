@@ -4,6 +4,7 @@ require('dotenv').config();
 import authRouter from './routes/authRouter'
 import userRouter from './routes/userRouter'
 import courseRouter from './routes/courseRouter'
+import employeeRouter from './routes/employeeRouter'
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(express.json())
 
 app.use("/api", authRouter);
 app.use("/api/users", userRouter);
+app.use("/api/employees", employeeRouter);
 app.use("/api/courses", courseRouter);
 
 app.listen(process.env.SERVER_PORT, () => {

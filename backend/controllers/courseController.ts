@@ -48,3 +48,58 @@ export const addCourse =  async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Error adding course' });
   }
 };
+
+export const allCourses = async (req: Request, res: Response) => {
+  try{
+    const courses = await prisma.course.findMany();
+    res.status(200).json({courses});
+  }catch(err){
+    console.error('Error at fetching all courses:', err);
+    res.status(500).json({ error: 'Error at fetching courses' });
+  }
+}
+
+
+export const courseEmployeeRelation = async (req: Request, res: Response) => {
+  try{
+    const courseId: number = Number(req.params.courseId);
+    const employees = await prisma.employee.findMany();
+    const empByCourseId = await prisma.courseEnrollment.findMany({
+      where:{
+        course_id: courseId
+      },
+      select:{
+        emp_id: true
+      }
+    });
+    const courseEmp = employees.map(emp => ({...emp,assignedCourse: empByCourseId.filter(cEmp => cEmp.emp_id === emp.emp_id).length === 0 ? false: true}));
+    res.status(200).json({courseEmp})
+  }catch(err){
+    console.error('Error at courseEmployeeRelation:', err);
+    res.status(500).json({ error: 'Error at fetching course-employee' });
+  }
+}
+
+export const courseEmployeeRelationUpdate = async (req: Request, res: Response) => {
+  try {
+    const courseId: number = Number(req.params.courseId);
+    const { selectedEmpIds }: { selectedEmpIds: string[] } = req.body; // Ensure selectedEmpIds is an array of strings
+    // console.log(selectedEmpIds)
+    // Create an array of CourseEnrollment records to insert
+    const enrollments = selectedEmpIds.map(empId => ({
+      emp_id: empId,
+      course_id: courseId,
+    }));
+
+    // Use createMany to insert the records
+    const result = await prisma.courseEnrollment.createMany({
+      data: enrollments,
+      skipDuplicates: true, // Optionally, skip duplicates if emp_id and course_id combination exists
+    });
+
+    res.status(201).json({ message: 'Course enrollments created successfully', result });
+  } catch (err) {
+    console.error('Error at courseEmployeeRelationUpdate:', err);
+    res.status(500).json({ error: 'Error at update course-employee' });
+  }
+};
