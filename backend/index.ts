@@ -1,9 +1,12 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+import axios from 'axios'
 import authRouter from './routes/authRouter'
 import userRouter from './routes/userRouter'
 import courseRouter from './routes/courseRouter'
+import employeeRouter from './routes/employeeRouter'
+import { Request, Response } from 'express';
 
 const app = express();
 
@@ -16,8 +19,22 @@ app.use(cors(corsOptions));
 
 app.use(express.json())
 
+app.get('/api/get-pdf', async (req: Request, res: Response) => {
+    try {
+      const pdfUrl = 'https://drive.google.com/uc?export=download&id=0B5_bYKSaSy3kNmFmSlFJYXhhUXc';
+      const response = await axios.get(pdfUrl, { responseType: 'arraybuffer' });
+      console.log(response.data)
+    //   res.setHeader('Content-Type', 'application/pdf');
+      res.status(200).json({data: response.data});
+    } catch (error) {
+      console.error('Error fetching PDF:', error);
+      res.status(500).send('Error fetching PDF');
+    }
+  });
+
 app.use("/api", authRouter);
 app.use("/api/users", userRouter);
+app.use("/api/employees", employeeRouter);
 app.use("/api/courses", courseRouter);
 
 app.listen(process.env.SERVER_PORT, () => {

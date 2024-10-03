@@ -38,9 +38,9 @@ const SigninForm : React.FC = () => {
             sessionStorage.setItem('authToken', token);
             sessionStorage.setItem('role', encryptText(role));
             if(role === 'ADMIN'){   // NAVIGATING TO ADMIN DASHBOARD
-                navigate('/admin');
+                navigate('/admin/dashboard');
             }else{                  // NAVIGATING TO EMPLOYEE DASHBOARD
-                navigate('/');
+                navigate('/dashboard');
             }
         }catch(err : unknown){
             if (axios.isAxiosError(err)) {

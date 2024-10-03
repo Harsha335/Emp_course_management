@@ -12,7 +12,7 @@ export const Navbar = () => {
         navigate('/login');
     }
     return (
-        <div className='w-[300px] '>
+        <div className='w-[300px] fixed'>
             <div id="side-nav" className="flex flex-col w-full gap-5 pt-5 p-4 justify-between min-h-screen">
                 <span className="flex flex-col gap-20 text-white">
                     {/* E-commerce logo */}

@@ -17,9 +17,9 @@ export const adminNavbarComponents = {
             url: '/admin/addCourse',
         },
         {
-            name: 'Assign Course',  // think of making it a popup
+            name: 'Employee Report',  // think of making it a popup
             icons: (await import('@mui/icons-material/Assignment')).default,
-            url: '/admin/assignCourse',
+            url: '/admin/employeeReport',
         }
     ]
 }
