@@ -8,7 +8,7 @@ const upload = multer({ storage: storage });
 
 const router = Router();
 
-router.post('/addCourse', verifyUser, upload.single('course_img'), addCourse);
+router.post('/addCourse', verifyUser, upload.fields([{ name: 'course_img', maxCount: 1 }, { name: 'course_file', maxCount: 1 }]), addCourse);
 router.get('/allCourses', verifyUser, allCourses);
 router.get('/courseEmp/:courseId', verifyUser, courseEmployeeRelation);
 router.post('/courseEmp/:courseId', verifyUser, courseEmployeeRelationUpdate);

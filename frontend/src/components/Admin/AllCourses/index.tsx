@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react"
-import CourseCard from "./courseCard"
+import CourseCard from "./CourseCard"
 import axiosTokenInstance from "../../../api_calls/api_token_instance";
 import AssignCoursePopup from "./AssignCoursePopup";
 import CourseDetailsPopup from "./CourseDetailsPopup";
+import PDFViewer from "./PdfViewer";
+import axios from "axios";
 
 
 // Enum for difficulty level
@@ -20,6 +22,7 @@ export type CourseType = {
     duration     : string;
     difficulty_level :DifficultyLevel;      // Changed to enum
     course_img_url: string;
+    course_file_url: string;
     tags :string[];
 }
 
@@ -50,18 +53,48 @@ const AllCourses = () => {
         }
         fetchCourses();
     },[]);
+    const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+    const onViewCourse = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, course_file_url: string) => {
+        e.stopPropagation();
+        try {
+          const response = await axios.post('http://localhost:5000/api/get-pdf',{course_file_url},{
+            responseType: 'blob', // Fetch as a Blob
+          });
+    
+          // Log the response to verify the Blob content
+          console.log("Blob response: ", response.data);
+    
+          // Create a Blob URL for the PDF
+          const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+          let pdfUrl = URL.createObjectURL(pdfBlob);
+          // Clean up the URL by removing spaces
+          pdfUrl = pdfUrl.replace(/\s+/g, '').trim();
+          console.log("Generated Blob URL: ", pdfUrl);
+    
+          // Set the URL for rendering in react-pdf
+          setPdfUrl(pdfUrl);
+    
+        } catch (err) {
+          console.error('Error fetching the PDF:', err);
+        }
+    }
+    const closePDFViewer = () => {
+        setPdfUrl(null);
+    }
+
     return (
         <div className="p-2 flex gap-5 flex-wrap justify-around">
-            {/* <CourseCard courseName="New Begginer " courseImgUrl="http://res.cloudinary.com/deppcolt3/image/upload/v1727847556/course_images/sfz2xzn95ktl8qaqnvaq.png" difficultyLevel="INTERMEDIATE" onClickAssignCourse={() => onClickAssignCourse(course)/> */}
             {
                 courses && courses.map((course: CourseType) => (
                     <div key={course.course_id} onClick={() => onClickCourseDetails(course)}>
-                        <CourseCard course={course} onClickAssignCourse={onClickAssignCourse}/>
+                        <CourseCard course={course} onClickAssignCourse={onClickAssignCourse} onViewCourse={onViewCourse}/>
                     </div>    
                 ))
             }
-            {coursePopupToggle && <CourseDetailsPopup course={coursePopupToggle} removePopup={removePopup}/>}
             {assignPopupToggle && <AssignCoursePopup course={assignPopupToggle} removePopup={removePopup}/>}
+            {coursePopupToggle && <CourseDetailsPopup course={coursePopupToggle} removePopup={removePopup}/>}
+
+            {pdfUrl && <PDFViewer pdfUrl={pdfUrl} closePDFViewer={closePDFViewer}/>}
         </div>
     )
 }

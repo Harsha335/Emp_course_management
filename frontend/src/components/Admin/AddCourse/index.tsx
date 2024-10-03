@@ -9,6 +9,7 @@ const AddCourse = () => {
     duration: string;
     difficulty_level: string;
     course_img: File | null;
+    course_file: File | null;
     description: string;
     tags: string[];  // Change to array of strings
   };
@@ -18,6 +19,7 @@ const AddCourse = () => {
     duration: '',
     difficulty_level: 'BASIC',
     course_img: null,
+    course_file: null,
     description: '',
     tags: [],
   });
@@ -37,6 +39,14 @@ const AddCourse = () => {
       // reader.readAsDataURL(event.target.files[0]);
     }
   };
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setFormData((prev) => ({
+          ...prev,
+          course_file: event.target.files[0], // Save the selected course file
+      }));
+    }
+};
 
   // Handle text input changes
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -73,6 +83,10 @@ const AddCourse = () => {
       if (formData.course_img) {
         formDataToSend.append('course_img', formData.course_img); // course_img is of type File
       }
+      // Append the course file directly
+      if (formData.course_file) {
+        formDataToSend.append('course_file', formData.course_file); // course_file is of type File
+      }
       console.log(formDataToSend.get('course_img'));
       await axiosTokenInstance.post('/api/courses/addCourse', formData,{
         headers: {
@@ -83,6 +97,7 @@ const AddCourse = () => {
         duration: '',
         difficulty_level: 'BASIC',
         course_img: null,
+        course_file: null,
         description: '',
         tags: [],
       });
@@ -159,11 +174,22 @@ const AddCourse = () => {
             <label className="block text-sm font-medium text-gray-700">Upload Course Image</label>
             <input
               type="file"
-              accept="image/png, image/jpeg"
+              accept="image/png, image/jpeg, image/jpg"
               onChange={handleImageChange}
               className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
             />
           </div>
+
+          {/* PDF upload */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Upload Course File (PDF)</label>
+            <input
+                type="file"
+                accept="application/pdf"
+                onChange={handleFileChange}
+                className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+            />
+        </div>
 
           {/* Tags Section */}
           <div className="mb-4">

@@ -1,10 +1,12 @@
 import React from 'react';
 // import { RibbonContainer,  Ribbon } from "react-ribbons";
 import { CourseType } from '.';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 interface CourseCardProps {
     course: CourseType;
     onClickAssignCourse: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, course: CourseType) => void;
+    onViewCourse: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, course_file_url: string) => Promise<void>;
 }
 
 const getDifficultyColor = (difficulty: string) => {
@@ -34,7 +36,7 @@ const ribbonStyle = {
     boxShadow: '0 calc(-1 * var(--f)) 0 inset #0005'
 };
 
-const CourseCard: React.FC<CourseCardProps> = ({course, onClickAssignCourse}) => {
+const CourseCard: React.FC<CourseCardProps> = ({course, onClickAssignCourse, onViewCourse}) => {
   return (
     // <RibbonContainer>
         <div className="w-80 rounded-lg shadow-lg bg-white relative flex flex-col cursor-pointer transform hover:scale-105 transition-transform duration-300
@@ -59,12 +61,19 @@ const CourseCard: React.FC<CourseCardProps> = ({course, onClickAssignCourse}) =>
             {/* Course Name & Button */}
             <div className="p-2 h-[4rem] flex gap-2 justify-between items-center">
                 <div className="text-lg font-semibold line-clamp-2 overflow-hidden">{course.course_name}</div>
-                <button
-                    onClick={(e) => onClickAssignCourse(e, course)}
-                    className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-2 rounded-lg whitespace-nowrap focus:outline-none shadow-lg"
-                    >
-                    Assign Course
-                </button>
+                <div className="flex flex-row gap-2">
+                  <button onClick={(e) => onViewCourse(e, course.course_file_url)}
+                      className="hover:text-blue-700"
+                      >
+                    <VisibilityIcon/>
+                  </button>
+                  <button
+                      onClick={(e) => onClickAssignCourse(e, course)}
+                      className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-2 rounded-lg whitespace-nowrap focus:outline-none shadow-lg"
+                      >
+                      Assign Course
+                  </button>
+                </div>
             </div>
         </div>
     // </RibbonContainer>

@@ -35,6 +35,8 @@ model Course {
   difficulty_level DifficultyLevel      // Changed to enum
   course_img_url   String
   tags              String[]
+  course_file_url   String
+  avg_time_spent Float?
 
   // Relationships
   CourseEnrollment CourseEnrollment[]
