@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addCourse, allCourses, courseEmployeeRelation, courseEmployeeRelationUpdate } from "../controllers/courseController";
+import { addCourse, allCourses, courseEmployeeRelation, courseEmployeeRelationUpdate, getPDF } from "../controllers/courseController";
 import { verifyUser } from "../middleware/verifyUser";
 // Multer configuration
 import multer from 'multer';
@@ -12,4 +12,7 @@ router.post('/addCourse', verifyUser, upload.fields([{ name: 'course_img', maxCo
 router.get('/allCourses', verifyUser, allCourses);
 router.get('/courseEmp/:courseId', verifyUser, courseEmployeeRelation);
 router.post('/courseEmp/:courseId', verifyUser, courseEmployeeRelationUpdate);
+
+router.post('/getPdf', getPDF);
+
 export default router;

@@ -4,7 +4,7 @@ import axiosTokenInstance from "../../../api_calls/api_token_instance";
 import AssignCoursePopup from "./AssignCoursePopup";
 import CourseDetailsPopup from "./CourseDetailsPopup";
 import PDFViewer from "./PdfViewer";
-import axios from "axios";
+import axiosInstance from "../../../api_calls/api_instance";
 
 
 // Enum for difficulty level
@@ -57,7 +57,7 @@ const AllCourses = () => {
     const onViewCourse = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, course_file_url: string) => {
         e.stopPropagation();
         try {
-          const response = await axios.post('http://localhost:5000/api/get-pdf',{course_file_url},{
+          const response = await axiosInstance.post('/api/courses/getPdf',{course_file_url},{
             responseType: 'blob', // Fetch as a Blob
           });
     

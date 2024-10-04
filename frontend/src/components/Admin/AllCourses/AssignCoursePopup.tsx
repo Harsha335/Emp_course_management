@@ -14,7 +14,6 @@ type CourseEmpType = {
   email: string;
   emp_id: string;
   emp_name: string;
-  performance_rating: number;
 };
 
 const AssignCoursePopup: React.FC<ParamsType> = ({ course, removePopup }) => {

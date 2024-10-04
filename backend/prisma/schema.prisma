@@ -14,32 +14,31 @@ datasource db {
 }
 
 model Employee {
-  emp_id          String    @id @unique // Primary Key
-  email           String    @unique
-  emp_name        String
-  designation     Designation // Enum
-  performance_rating Float?
+  emp_id             String      @id @unique // Primary Key
+  email              String      @unique
+  emp_name           String
+  designation        Designation // Enum
 
   // Foreign key relation to User
-  user            User       @relation(fields: [emp_id], references: [user_id], onDelete: Cascade)
+  user User @relation(fields: [emp_id], references: [user_id], onDelete: Cascade)
 
   // Relationships
   CourseEnrollment CourseEnrollment[]
 }
 
 model Course {
-  course_id        Int                 @id @default(autoincrement()) // Primary Key
+  course_id        Int             @id @default(autoincrement()) // Primary Key
   course_name      String
-  description      String              // Added field
+  description      String // Added field
   duration         String
-  difficulty_level DifficultyLevel      // Changed to enum
+  difficulty_level DifficultyLevel // Enum for difficulty level
   course_img_url   String
-  tags              String[]
-  course_file_url   String
-  avg_time_spent Float?
+  tags             String[]
+  course_file_url  String
 
   // Relationships
   CourseEnrollment CourseEnrollment[]
+  QuestionBank     QuestionBank[]
 }
 
 // Enum for difficulty level
@@ -51,29 +50,62 @@ enum DifficultyLevel {
 }
 
 model CourseEnrollment {
-  enroll_id                  Int      @id @default(autoincrement())  // Primary Key
-  emp_id                     String                                   // Foreign key reference to Employee
-  course_id                  Int                                      // Foreign key reference to Course
-  course_completion_rate      Int?                                    // Optional completion rate
-  course_certificate_approved Boolean?                               // Optional certificate approval status
-  
-  // Relationships
-  employee                   Employee  @relation(fields: [emp_id], references: [emp_id], onDelete: Cascade)
-  course                     Course    @relation(fields: [course_id], references: [course_id], onDelete: Cascade)
+  enroll_id                    Int     @id @default(autoincrement()) // Primary Key
+  emp_id                       String // Foreign key reference to Employee
+  course_id                    Int // Foreign key reference to Course
+  course_completion_percentage Int? // Optional completion rate
+  test_score                   Float?
+  course_certificate_url       String? // Optional certificate URL
+  avg_time_spent   Float?
 
-  @@unique([emp_id, course_id])                                       // Prevent duplicate enrollments
+  // Relationships
+  employee           Employee             @relation(fields: [emp_id], references: [emp_id], onDelete: Cascade)
+  course             Course               @relation(fields: [course_id], references: [course_id], onDelete: Cascade)
+  AdminNotifications AdminNotifications[]
+
+  @@unique([emp_id, course_id]) // Prevent duplicate enrollments
+}
+
+model QuestionBank {
+  test_id   String      @id @default(uuid()) // Changed to String with uuid generation
+  course_id Int
+  questions Questions[]
+
+  // Relationships
+  course Course @relation(fields: [course_id], references: [course_id], onDelete: Cascade)
+}
+
+model Questions {
+  question_id      Int      @id @default(autoincrement()) // Primary Key
+  question         String // The question text
+  options          String[] // Array of options (can be multiple)
+  isMultipleChoice Boolean // Is it a multiple-choice question?
+  answers          Int[] // Array of indices representing the correct answer(s)
+  test_id          String // Foreign key to the QuestionBank
+
+  // Foreign key relation to QuestionBank
+  QuestionBank QuestionBank @relation(fields: [test_id], references: [test_id], onDelete: Cascade)
+}
+
+model AdminNotifications {
+  notification_id Int     @id @default(autoincrement()) // Primary Key
+  enroll_id       Int // Foreign key to CourseEnrollment
+  status          Boolean?
+
+  // Foreign key relation to CourseEnrollment
+  CourseEnrollment CourseEnrollment @relation(fields: [enroll_id], references: [enroll_id], onDelete: Cascade)
 }
 
 model User {
-  user_id        String     @id @unique  // Primary Key
-  password       String
-  role           Role      @default(EMPLOYEE) // Default role is EMPLOYEE //ENUM
+  user_id  String @id @unique // Primary Key
+  password String
+  role     Role   @default(EMPLOYEE) // Default role is EMPLOYEE // Enum
 
-  // Relationship to Employee
-  Employee       Employee[]
+  // Relationship to Employee (one-to-many)
+  Employee Employee[]
 }
 
-// Enums for predefined sets of values
+// Enum for employee designation
 enum Designation {
   SOFTWARE_ENGINEER
   SR_SOFTWARE_ENGINEER
@@ -83,6 +115,7 @@ enum Designation {
   PRINCIPAL_SOLUTION_ARCHITECT
 }
 
+// Enum for user roles
 enum Role {
   ADMIN
   EMPLOYEE

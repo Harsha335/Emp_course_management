@@ -1,120 +1,235 @@
-import React from 'react';
-import { pdfjs } from 'react-pdf';
-import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+// // SHOWES PDF AND ONLY TIME SPEND ON THE PDF , THIS DOES NOT INCLUDE THE PERCENTAGE COMPLETED
+
+// import React, { useEffect, useRef } from 'react';
+// import { pdfjs } from 'react-pdf';
+// import axiosTokenInstance from '../../../api_calls/api_token_instance';
+// // import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+// pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+
+// type PDFViewerType = {
+//   pdfUrl: string;
+//   closePDFViewer: () => void;
+// }
+
+// const PDFViewer: React.FC<PDFViewerType> = ({ pdfUrl, closePDFViewer }) => {
+//   const startTimeRef = useRef<number | null>(null);              // Time when popup opens
+
+//   // Function to handle closing the PDF
+//   const handlePDFClose = async () => {
+//     try {
+//       const endTime = Date.now();  // Time when closing
+//       const timeSpent = (endTime - (startTimeRef.current || 0)) / 1000; // Time spent in seconds
+
+//       console.log('Time spent on PDF:', timeSpent, 'seconds');
+
+//       // send data to the backend
+//       // await axiosTokenInstance.post('/api/courses/track', {
+//       //   timeSpent,
+//       //   scrollPercentage
+//       // });
+
+//     } catch (err) {
+//       console.log('Error at handlePDFClose: ', err);
+//     }
+//     closePDFViewer();  // Close the PDF popup
+//   };
+
+//   return (
+// <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+//   <div className="bg-white min-w-[80%] h-full rounded-lg shadow-lg max-w-md relative">
+//     <button
+//       onClick={handlePDFClose}
+//       className="absolute top-2 right-[-5rem] text-white bg-red-500 px-3 py-2 rounded-lg shadow-md shadow-black hover:scale-110 cursor-pointer"
+//     >
+//       {/* <CancelOutlinedIcon /> */}
+//       Close
+//     </button>
+//         <iframe
+//           src={pdfUrl}
+//           width="100%"
+//           height="100%"
+//           title="PDF Viewer"
+//         />
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default PDFViewer;
+
+
+
+// import React, { ReactElement, useEffect, useRef, useState } from "react";
+// import { Worker, Viewer, SpecialZoomLevel } from "@react-pdf-viewer/core";
+// import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
+// import { toolbarPlugin, ToolbarSlot } from "@react-pdf-viewer/toolbar";
+
+// import "@react-pdf-viewer/core/lib/styles/index.css";
+// import "@react-pdf-viewer/default-layout/lib/styles/index.css";
+
+// type PDFViewerType = {
+//   pdfUrl: string;
+//   closePDFViewer: () => void;
+// };
+
+// const PDFViewer: React.FC<PDFViewerType> = ({ pdfUrl, closePDFViewer }) => {
+//   const [timeSpent, setTimeSpent] = useState(0); // Track time spent
+//   const [currentPage, setCurrentPage] = useState(0); // Track current page number
+//   const [totalPages, setTotalPages] = useState(0); // Track total pages
+
+//   // Track time spent viewing the PDF
+//   useEffect(() => {
+//     const startTime = Date.now();
+
+//     // Timer to calculate time spent
+//     const intervalId = setInterval(() => {
+//       setTimeSpent(Math.floor((Date.now() - startTime) / 1000)); // Time in seconds
+//     }, 1000);
+
+//     return () => {
+//       clearInterval(intervalId); // Stop timer on unmount
+//     };
+//   }, []);
+
+//   // Track page change
+//   const handlePageChange = (e: { currentPage: number; doc: any }) => {
+//     setCurrentPage(e.currentPage + 1); // Page numbers are 0-indexed, so we add 1
+//     setTotalPages(e.doc.numPages); // Get the total number of pages
+//   };
+
+//   const renderToolbar = (Toolbar: (props: any) => ReactElement) => (
+//     <Toolbar>
+//       {(slots: ToolbarSlot) => {
+//         const { ZoomOut } = slots;
+//         return (
+//           <div
+//             style={{
+//               alignItems: "center",
+//               display: "flex",
+//             }}
+//           >
+//             <div style={{ padding: "0px 2px" }}>
+//               <ZoomOut>
+//                 {(props: any) => (
+//                   <button
+//                     style={{
+//                       backgroundColor: "#357edd",
+//                       border: "none",
+//                       borderRadius: "4px",
+//                       color: "#ffffff",
+//                       cursor: "pointer",
+//                       padding: "8px",
+//                     }}
+//                     onClick={props.onClick}
+//                   >
+//                     Zoom out
+//                   </button>
+//                 )}
+//               </ZoomOut>
+//             </div>
+//             {/* Add other toolbar slots as needed */}
+//           </div>
+//         );
+//       }}
+//     </Toolbar>
+//   );
+
+//   const defaultLayoutPluginInstance = defaultLayoutPlugin();
+
+//   return (
+//     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+//       <div className="bg-white min-w-[80%] h-full rounded-lg shadow-lg max-w-md relative">
+//         <button
+//           onClick={closePDFViewer}
+//           className="absolute top-2 right-[-5rem] text-white bg-red-500 px-3 py-2 rounded-lg shadow-md shadow-black hover:scale-110 cursor-pointer"
+//         >
+//           Close
+//         </button>
+
+//         {/* Display time spent, current page, and total pages */}
+//         <div className="p-4 text-sm text-gray-700">
+//           Time spent on PDF: {timeSpent} seconds <br />
+//           Page: {currentPage} / {totalPages}
+//         </div>
+
+//         <Worker workerUrl="/pdf.worker.mjs">
+//           {/* <div style={{ height: "720px", overflowY: "auto" }}> */}
+//             <Viewer
+//               fileUrl={pdfUrl}
+//               plugins={[defaultLayoutPluginInstance]}
+//               onPageChange={handlePageChange} // Capture page change
+//               defaultScale={SpecialZoomLevel.PageWidth} // Ensure the page fits the width of the viewer
+//             />
+//           {/* </div> */}
+//         </Worker>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default PDFViewer;
+
+
+import React, { useEffect, useState } from "react";
+import { Worker, Viewer } from '@react-pdf-viewer/core';
+import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
+import "@react-pdf-viewer/core/lib/styles/index.css";
+import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 
 type PDFViewerType = {
   pdfUrl: string;
   closePDFViewer: () => void;
-}
-const PDFViewer: React.FC<PDFViewerType> = ({pdfUrl, closePDFViewer}) => {
+};
+
+const PDFViewer: React.FC<PDFViewerType> = ({ pdfUrl, closePDFViewer }) => {
+  const [timeSpent, setTimeSpent] = useState(0); // Track time spent
+  const [currentPage, setCurrentPage] = useState(0); // Track current page number
+  const [totalPages, setTotalPages] = useState(0); // Track total pages
+
+  // Initialize the default layout plugin
+  const defaultLayoutPluginInstance = defaultLayoutPlugin();
+
+  // Track time spent viewing the PDF
+  useEffect(() => {
+    const startTime = Date.now();
+
+    // Timer to calculate time spent
+    const intervalId = setInterval(() => {
+      setTimeSpent(Math.floor((Date.now() - startTime) / 1000)); // Time in seconds
+    }, 1000);
+
+    return () => {
+      clearInterval(intervalId); // Stop timer on unmount
+    };
+  }, []);
+
+  // Track page change
+  const handlePageChange = (e: { currentPage: number; doc: any }) => {
+    setCurrentPage(e.currentPage + 1); // Page numbers are 0-indexed, so we add 1
+    setTotalPages(e.doc.numPages); // Get the total number of pages
+  };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white min-w-[80%] h-full rounded-lg shadow-lg max-w-md relative">
+      <div className="bg-white min-w-[80%] h-[95%] relative">
         <button
-            onClick={closePDFViewer}
-            className="absolute top-2 right-2 text-white hover:scale-150 cursor-pointer"
-          >
-          <CancelOutlinedIcon />
+          onClick={closePDFViewer}
+          className="absolute top-2 right-[-5rem] text-white bg-red-500 px-3 py-2 rounded-lg shadow-md shadow-black hover:scale-110 cursor-pointer"
+        >
+          Close
         </button>
-        <iframe
-          src={pdfUrl}
-          width="100%"
-          height="100%"
-          title="PDF Viewer"
-        />
+
+        <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+            <Viewer
+              fileUrl={pdfUrl}
+              plugins={[defaultLayoutPluginInstance]} // Use the plugin directly
+              onPageChange={handlePageChange} // Capture page change
+              // defaultScale={SpecialZoomLevel.PageWidth} // Ensure the page fits the width of the viewer
+            />
+        </Worker>
       </div>
     </div>
   );
 };
 
 export default PDFViewer;
-
-// import React, { useState } from 'react';
-// import axios from 'axios';
-// // import { Document, Page } from 'react-pdf';
-// import { pdfjs } from 'react-pdf';
-// pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
-
-// // pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.js`;
-
-// const PDFViewer: React.FC = () => {
-//   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-//   const [loading, setLoading] = useState<boolean>(false);
-//   const [error, setError] = useState<string | null>(null);
-//   // const [numPages, setNumPages] = useState<number>();
-//   // const [pageNumber, setPageNumber] = useState<number>(1);
-
-//   const fetchPdf = async () => {
-//     setLoading(true);
-//     setError(null);
-
-//     try {
-//       const response = await axios.get('http://localhost:5000/api/get-pdf', {
-//         responseType: 'blob', // Fetch as a Blob
-//       });
-
-//       // Log the response to verify the Blob content
-//       console.log("Blob response: ", response.data);
-
-//       // Create a Blob URL for the PDF
-//       const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
-//       let pdfUrl = URL.createObjectURL(pdfBlob);
-//       // Clean up the URL by removing spaces
-//       pdfUrl = pdfUrl.replace(/\s+/g, '').trim();
-//       console.log("Generated Blob URL: ", pdfUrl);
-
-//       // Set the URL for rendering in react-pdf
-//       setPdfUrl(pdfUrl);
-
-//     } catch (err) {
-//       setError('Error fetching the PDF.');
-//       console.error('Error fetching the PDF:', err);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   // function onDocumentLoadSuccess({ numPages }: { numPages: number }): void {
-//   //   setNumPages(numPages);
-//   // }
-
-//   return (
-//     <div>
-//       <button onClick={fetchPdf}>Fetch PDF</button>
-
-//       {loading && <p>Loading...</p>}
-//       {error && <p style={{ color: 'red' }}>{error}</p>}
-
-//       {pdfUrl && (
-//         <div>
-//           <h3>PDF Preview</h3>
-//           <div className='w-full h-screen'>
-//             <iframe
-//               src={pdfUrl}
-//               width="100%"
-//               height="100%"
-//               style={{ border: 'none' }}
-//               title="PDF Viewer"
-//             />
-//           </div>
-//           {/* Display the PDF in the Document component */}
-//           {/* <Document
-//             file={pdfUrl}
-//             onLoadSuccess={onDocumentLoadSuccess}
-//           >
-//             {Array.from(new Array(numPages), (_, index) => (
-//               <Page key={`page_${index + 1}`} pageNumber={index + 1} />
-//             ))}
-//           </Document>
-//           <p>
-//             Page {pageNumber} of {numPages}
-//           </p> */}
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default PDFViewer;

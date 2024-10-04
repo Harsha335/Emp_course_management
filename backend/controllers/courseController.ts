@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
 import cloudinary from '../utils/cloudinary';
+import axios from 'axios';
 const { Dropbox } = require('dropbox');
 require('dotenv').config();
 
@@ -17,11 +18,11 @@ const convertToBase64 = (buffer: Buffer, mimeType: string) => {
 // Function to upload file to Dropbox
 const uploadToDropbox = async (fileBuffer: Buffer, fileName: string): Promise<string> => {
   const dbx = new Dropbox({ accessToken: process.env.DROP_BOX_ACCESS_TOKEN});
-  
+  const uniqueFileName = `${fileName}_${Date.now()}`;
   try {
       // Upload the file
       const response = await dbx.filesUpload({
-          path: `/${fileName}`, 
+          path: `/${uniqueFileName}`, 
           contents: fileBuffer,
       });
       
@@ -65,7 +66,6 @@ export const addCourse = async (req: Request, res: Response) => {
         const pdfPublicUrl = await uploadToDropbox(courseFile.buffer, courseFile.originalname); // Upload PDF to Dropbox and get public URL
 
         console.log("PDF Public URL: ", pdfPublicUrl);
-        console.log("pdf url: ", pdfPublicUrl);
         
 
         // Create the course in the database
@@ -141,5 +141,27 @@ export const courseEmployeeRelationUpdate = async (req: Request, res: Response) 
   } catch (err) {
     console.error('Error at courseEmployeeRelationUpdate:', err);
     res.status(500).json({ error: 'Error at update course-employee' });
+  }
+};
+
+export const getPDF =  async (req: Request, res: Response) => {
+  try {
+    const {course_file_url} = req.body;
+    // console.log('pdfUrl: ',course_file_url)
+    const response = await axios.get(course_file_url, { responseType: 'arraybuffer' });
+
+    
+    // Set headers to correctly display the PDF file in the frontend
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'inline; filename="file.pdf"');
+    // Log response details
+    // console.log("Fetched PDF length: ", response.data.length);
+    // console.log("Fetched PDF headers: ", response.headers);
+    
+    // Send the PDF data as array buffer
+    res.send(response.data);
+  } catch (error) {
+    console.error('Error fetching PDF:', error);
+    res.status(500).send('Error fetching PDF');
   }
 };
