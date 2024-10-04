@@ -224,6 +224,7 @@ const PDFViewer: React.FC<PDFViewerType> = ({ pdfUrl, closePDFViewer }) => {
               fileUrl={pdfUrl}
               plugins={[defaultLayoutPluginInstance]} // Use the plugin directly
               onPageChange={handlePageChange} // Capture page change
+              initialPage={10-1}  // starts at initialPage+1
               // defaultScale={SpecialZoomLevel.PageWidth} // Ensure the page fits the width of the viewer
             />
         </Worker>
