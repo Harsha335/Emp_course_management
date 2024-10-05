@@ -39,6 +39,8 @@ model Course {
   // Relationships
   CourseEnrollment CourseEnrollment[]
   QuestionBank     QuestionBank[]
+
+  @@unique([course_name, difficulty_level])
 }
 
 // Enum for difficulty level

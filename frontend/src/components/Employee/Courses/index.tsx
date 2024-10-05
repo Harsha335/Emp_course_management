@@ -46,6 +46,7 @@ const Courses = () => {
     }
     const removePopup = () => {
         setCoursePopupToggleData(null);
+        setPdfPopupToggleData(null);
     }
     useEffect(() => {
         const fetchCourses = async () => {
@@ -84,11 +85,10 @@ const Courses = () => {
           console.error('Error fetching the PDF:', err);
         }
     }
-    const closePDFViewer = () => {
-        setPdfPopupToggleData(null);
-    }
 
     const onClickTakeTest = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, assignedCourse: AssignedCourseType) => {
+        e.preventDefault();
+        e.stopPropagation();
         alert("Take Test");
     }
 
@@ -103,7 +103,7 @@ const Courses = () => {
             }
             {coursePopupToggleData && <CourseDetailsPopup course={coursePopupToggleData} removePopup={removePopup}/>}
 
-            {pdfPopupToggleData && <PDFViewer data={pdfPopupToggleData} closePDFViewer={closePDFViewer}/>}
+            {pdfPopupToggleData && <PDFViewer data={pdfPopupToggleData} closePDFViewer={removePopup}/>}
         </div>
     )
 }
