@@ -38,7 +38,7 @@ model Course {
 
   // Relationships
   CourseEnrollment CourseEnrollment[]
-  QuestionBank     QuestionBank[]
+  QuestionBank    QuestionBank? // Made optional
 
   @@unique([course_name, difficulty_level])
 }
@@ -75,7 +75,7 @@ model CourseEngageLogs {
   time_spent_in_sec         Int
 
   // Relation to CourseEnrollment
-  CourseEnrollment CourseEnrollment @relation(fields: [enroll_id], references: [enroll_id], onDelete: Cascade)
+  CourseEnrollment CourseEnrollment @relation(fields: [enroll_id], references: [enroll_id])
 
   @@unique([enroll_id, start_time]) // Prevent duplicate enrollments
 }
@@ -83,14 +83,16 @@ model CourseEngageLogs {
 model QuestionBank {
   test_id   String      @id @default(uuid()) // Changed to String with uuid generation
   course_id Int
-  questions Questions[]
+  time_per_question_in_sec Int
 
   // Relationships
-  course Course @relation(fields: [course_id], references: [course_id], onDelete: Cascade)
+  course Course @relation(fields: [course_id], references: [course_id]) // Made optional
+  Questions Questions[] 
+  @@unique([course_id])
 }
 
 model Questions {
-  question_id      Int      @id @default(autoincrement()) // Primary Key
+  question_id      Int 
   question         String // The question text
   options          String[] // Array of options (can be multiple)
   isMultipleChoice Boolean // Is it a multiple-choice question?
@@ -99,6 +101,8 @@ model Questions {
 
   // Foreign key relation to QuestionBank
   QuestionBank QuestionBank @relation(fields: [test_id], references: [test_id], onDelete: Cascade)
+
+  @@unique([question_id, test_id])
 }
 
 model AdminNotifications {
