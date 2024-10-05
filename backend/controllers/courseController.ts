@@ -2,8 +2,13 @@ import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
 import cloudinary from '../utils/cloudinary';
 import axios from 'axios';
+import { JwtPayloadType } from '../utils/jwtHelper';
 const { Dropbox } = require('dropbox');
 require('dotenv').config();
+
+interface CustomRequest extends Request {
+  user?: JwtPayloadType;
+}
 
 // Function to convert image buffer to base64
 const convertToBase64 = (buffer: Buffer, mimeType: string) => {
@@ -41,7 +46,7 @@ const uploadToDropbox = async (fileBuffer: Buffer, fileName: string): Promise<st
   }
 };
 
-export const addCourse = async (req: Request, res: Response) => {
+export const addCourse = async (req: CustomRequest, res: Response) => {
     try {
         const { course_name, duration, difficulty_level, description, tags } = req.body;
         
@@ -89,7 +94,7 @@ export const addCourse = async (req: Request, res: Response) => {
 };
 
 
-export const allCourses = async (req: Request, res: Response) => {
+export const allCourses = async (req: CustomRequest, res: Response) => {
   try{
     const courses = await prisma.course.findMany();
     res.status(200).json({courses});
@@ -100,7 +105,7 @@ export const allCourses = async (req: Request, res: Response) => {
 }
 
 
-export const courseEmployeeRelation = async (req: Request, res: Response) => {
+export const courseEmployeeRelation = async (req: CustomRequest, res: Response) => {
   try{
     const courseId: number = Number(req.params.courseId);
     const employees = await prisma.employee.findMany();
@@ -120,7 +125,7 @@ export const courseEmployeeRelation = async (req: Request, res: Response) => {
   }
 }
 
-export const courseEmployeeRelationUpdate = async (req: Request, res: Response) => {
+export const courseEmployeeRelationUpdate = async (req: CustomRequest, res: Response) => {
   try {
     const courseId: number = Number(req.params.courseId);
     const { selectedEmpIds }: { selectedEmpIds: string[] } = req.body; // Ensure selectedEmpIds is an array of strings
@@ -144,7 +149,7 @@ export const courseEmployeeRelationUpdate = async (req: Request, res: Response) 
   }
 };
 
-export const getPDF =  async (req: Request, res: Response) => {
+export const getPDF =  async (req: CustomRequest, res: Response) => {
   try {
     const {course_file_url} = req.body;
     // console.log('pdfUrl: ',course_file_url)
@@ -165,3 +170,62 @@ export const getPDF =  async (req: Request, res: Response) => {
     res.status(500).send('Error fetching PDF');
   }
 };
+
+export const assignedCoursesDetails = async (req: CustomRequest, res: Response) => {
+  try{
+    const user_id = req.user?.user_id;
+    if(!user_id){
+      res.status(400).json({message: "Unverified user"});
+    }else{
+      const coursesAssigned = await prisma.courseEnrollment.findMany({
+        where: {
+          emp_id: user_id
+        },
+        select:{
+          enroll_id: true,
+          current_page: true,
+          test_score: true,
+          course_certificate_url: true,
+          course: true
+        }
+      });
+      // console.log("coursesAssigned: ",coursesAssigned);
+      res.status(200).json({coursesAssigned});
+    }
+  }catch(error){
+    console.error('Error @ fetching assignedCourses:', error);
+    res.status(500).send('Error @ fetching assignedCourses');
+  }
+}
+
+export const updateAssignedCourse = async (req: CustomRequest, res: Response) => {
+  try{
+    const {
+      enroll_id,
+      start_time,
+      time_spent_in_sec,
+      current_page,
+      total_pages
+    } = req.body;
+    await prisma.courseEnrollment.update({
+      where:{
+        enroll_id
+      },
+      data:{
+        current_page,
+        total_pages
+      }
+    });
+    await prisma.courseEngageLogs.create({
+      data: {
+        enroll_id,
+        start_time: new Date(start_time),
+        time_spent_in_sec
+      }
+    });
+    res.status(200).json({message: "updated successfully"});
+  }catch(error){
+    console.error('Error @ updateAssignedCourse:', error);
+    res.status(500).send('Error @ updating CourseEngageLogs');
+  }
+}

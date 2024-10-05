@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { getAllUsers } from '../controllers/userController';
-import { verifyUser } from '../middleware/verifyUser';
+import { verifyAdmin } from '../middleware/verifyUser';
 
 const router = Router();
 
-router.get('/', verifyUser, getAllUsers);
+router.get('/', verifyAdmin, getAllUsers);
 
 export default router;

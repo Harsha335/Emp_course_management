@@ -53,17 +53,29 @@ model CourseEnrollment {
   enroll_id                    Int     @id @default(autoincrement()) // Primary Key
   emp_id                       String // Foreign key reference to Employee
   course_id                    Int // Foreign key reference to Course
-  course_completion_percentage Int? // Optional completion rate
+  current_page                 Int?
+  total_pages                   Int?
   test_score                   Float?
   course_certificate_url       String? // Optional certificate URL
-  avg_time_spent   Float?
 
   // Relationships
   employee           Employee             @relation(fields: [emp_id], references: [emp_id], onDelete: Cascade)
   course             Course               @relation(fields: [course_id], references: [course_id], onDelete: Cascade)
   AdminNotifications AdminNotifications[]
+  CourseEngageLogs   CourseEngageLogs[]
 
   @@unique([emp_id, course_id]) // Prevent duplicate enrollments
+}
+
+model CourseEngageLogs {
+  enroll_id                 Int
+  start_time                DateTime
+  time_spent_in_sec         Int
+
+  // Relation to CourseEnrollment
+  CourseEnrollment CourseEnrollment @relation(fields: [enroll_id], references: [enroll_id], onDelete: Cascade)
+
+  @@unique([enroll_id, start_time]) // Prevent duplicate enrollments
 }
 
 model QuestionBank {

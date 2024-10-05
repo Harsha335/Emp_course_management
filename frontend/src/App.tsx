@@ -8,6 +8,7 @@ import AdminDashboard from "./components/Admin/Dashboard";
 import AddCourse from "./components/Admin/AddCourse";
 import AllCourses from "./components/Admin/AllCourses";
 import EmployeeReport from "./components/Admin/EmployeeReport";
+import Courses from "./components/Employee/Courses";
 
 
 
@@ -18,6 +19,7 @@ function App() {
         <Route path="/login" element={<Login/>}/>
         <Route element={<EmpProtectedRoute/>}>
           <Route path="/dashboard" element={<EmployeeDashboard/>}/>
+          <Route path="/courses" element={<Courses/>}/>
         </Route>
         <Route element={<AdminProtectedRoute/>}>
           <Route path="/admin/dashboard" element={<AdminDashboard/>}/>

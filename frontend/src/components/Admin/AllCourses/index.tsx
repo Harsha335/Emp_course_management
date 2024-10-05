@@ -4,7 +4,6 @@ import axiosTokenInstance from "../../../api_calls/api_token_instance";
 import AssignCoursePopup from "./AssignCoursePopup";
 import CourseDetailsPopup from "./CourseDetailsPopup";
 import PDFViewer from "./PdfViewer";
-import axiosInstance from "../../../api_calls/api_instance";
 
 
 // Enum for difficulty level
@@ -40,6 +39,7 @@ const AllCourses = () => {
     const removePopup = () => {
         setAssignPopupToggle(null);
         setCoursePopupToggle(null);
+        setPdfUrl(null);
     }
     useEffect(() => {
         const fetchCourses = async () => {
@@ -54,10 +54,11 @@ const AllCourses = () => {
         fetchCourses();
     },[]);
     const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-    const onViewCourse = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, course_file_url: string) => {
+    const onViewCourse = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, course: CourseType) => {
         e.stopPropagation();
+        const course_file_url: string = course.course_file_url;
         try {
-          const response = await axiosInstance.post('/api/courses/getPdf',{course_file_url},{
+          const response = await axiosTokenInstance.post('/api/courses/getPdf',{course_file_url},{
             responseType: 'blob', // Fetch as a Blob
           });
     
@@ -73,13 +74,9 @@ const AllCourses = () => {
     
           // Set the URL for rendering in react-pdf
           setPdfUrl(pdfUrl);
-    
         } catch (err) {
           console.error('Error fetching the PDF:', err);
         }
-    }
-    const closePDFViewer = () => {
-        setPdfUrl(null);
     }
 
     return (
@@ -94,7 +91,7 @@ const AllCourses = () => {
             {assignPopupToggle && <AssignCoursePopup course={assignPopupToggle} removePopup={removePopup}/>}
             {coursePopupToggle && <CourseDetailsPopup course={coursePopupToggle} removePopup={removePopup}/>}
 
-            {pdfUrl && <PDFViewer pdfUrl={pdfUrl} closePDFViewer={closePDFViewer}/>}
+            {pdfUrl && <PDFViewer pdfUrl={pdfUrl} closePDFViewer={removePopup}/>}
         </div>
     )
 }

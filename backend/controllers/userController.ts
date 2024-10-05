@@ -1,8 +1,13 @@
 import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
+import { JwtPayloadType } from '../utils/jwtHelper';
+
+interface CustomRequest extends Request {
+  user?: JwtPayloadType;
+}
 
 // Get all users
-export const getAllUsers = async (req: Request, res: Response) => {
+export const getAllUsers = async (req: CustomRequest, res: Response) => {
   try {
     const users = await prisma.user.findMany();
     console.log(users)

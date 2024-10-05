@@ -34,7 +34,7 @@ export const employeeNavbarComponents = {
         {
             name: 'Assigned Courses',
             icons: (await import('@mui/icons-material/Assignment')).default,
-            url: '/assignedCourse',
+            url: '/courses',
         }
     ]
 }

@@ -26,7 +26,7 @@ export const signInUser = async (req: Request, res: Response) => {
     }
 
     // Generate JWT token
-    const token = generateToken(user.user_id);
+    const token = generateToken({user_id: user.user_id, role: user.role});
 
     res.status(200).json({role: user.role, token });
   } catch (error) {

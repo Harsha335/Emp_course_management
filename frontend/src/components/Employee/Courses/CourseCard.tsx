@@ -1,12 +1,12 @@
 import React from 'react';
 // import { RibbonContainer,  Ribbon } from "react-ribbons";
-import { CourseType } from '.';
+import { AssignedCourseType } from '.';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
 interface CourseCardProps {
-    course: CourseType;
-    onClickAssignCourse: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, course: CourseType) => void;
-    onViewCourse: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, course: CourseType) => Promise<void>;
+  assignedCourse: AssignedCourseType;
+  onClickTakeTest: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, assignedCourse: AssignedCourseType) => void;  
+  onViewCourse: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, assignedCourse: AssignedCourseType) => Promise<void>;
 }
 
 const getDifficultyColor = (difficulty: string) => {
@@ -36,13 +36,13 @@ const ribbonStyle = {
     boxShadow: '0 calc(-1 * var(--f)) 0 inset #0005'
 };
 
-const CourseCard: React.FC<CourseCardProps> = ({course, onClickAssignCourse, onViewCourse}) => {
+const CourseCard: React.FC<CourseCardProps> = ({assignedCourse, onClickTakeTest, onViewCourse}) => {
   return (
     // <RibbonContainer>
         <div className="w-80 rounded-lg shadow-lg bg-white relative flex flex-col cursor-pointer transform hover:scale-105 transition-transform duration-300
 ">
             {/* Course Image */}
-            <img src={course.course_img_url} alt={course.course_name} className="h-48 object-cover" />
+            <img src={assignedCourse.course.course_img_url} alt={assignedCourse.course.course_name} className="h-48 object-cover" />
             {/* <Ribbon
                 side="right"
                 type="edge"
@@ -55,23 +55,23 @@ const CourseCard: React.FC<CourseCardProps> = ({course, onClickAssignCourse, onV
                     {course.difficulty_level}
             </Ribbon> */}
             {/* <div className="relative max-w-md mx-auto my-12 bg-lightblue-200 h-52"> */}
-            <div className={`absolute ${getDifficultyColor(course.difficulty_level)}`} style={ribbonStyle}>{course.difficulty_level}</div>
+            <div className={`absolute ${getDifficultyColor(assignedCourse.course.difficulty_level)}`} style={ribbonStyle}>{assignedCourse.course.difficulty_level}</div>
             {/* </div>/ */}
 
             {/* Course Name & Button */}
             <div className="p-2 h-[4rem] flex gap-2 justify-between items-center">
-                <div className="text-lg font-semibold line-clamp-2 overflow-hidden">{course.course_name}</div>
+                <div className="text-lg font-semibold line-clamp-2 overflow-hidden">{assignedCourse.course.course_name}</div>
                 <div className="flex flex-row gap-2">
-                  <button onClick={(e) => onViewCourse(e, course)}
+                  <button onClick={(e) => onViewCourse(e, assignedCourse)}
                       className="hover:text-blue-700"
                       >
                     <VisibilityIcon/>
                   </button>
                   <button
-                      onClick={(e) => onClickAssignCourse(e, course)}
+                      onClick={(e) => onClickTakeTest(e, assignedCourse)}
                       className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-2 rounded-lg whitespace-nowrap focus:outline-none shadow-lg"
                       >
-                      Assign Course
+                      Take Test
                   </button>
                 </div>
             </div>
