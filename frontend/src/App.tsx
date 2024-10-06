@@ -10,6 +10,7 @@ import AllCourses from "./components/Admin/AllCourses";
 import EmployeeReport from "./components/Admin/EmployeeReport";
 import Courses from "./components/Employee/Courses";
 import CreateTest from "./components/Admin/CreateTest";
+import TestWindow from "./components/Employee/Courses/TestWindow";
 
 
 
@@ -22,6 +23,7 @@ function App() {
           <Route path="/dashboard" element={<EmployeeDashboard/>}/>
           <Route path="/courses" element={<Courses/>}/>
         </Route>
+          <Route path="/test" element={<TestWindow/>}/>
         <Route element={<AdminProtectedRoute/>}>
           <Route path="/admin/dashboard" element={<AdminDashboard/>}/>
           <Route path="/admin/allCourses" element={<AllCourses/>}/>

@@ -3,6 +3,7 @@ import CourseCard from "./CourseCard"
 import CourseDetailsPopup from "./CourseDetailsPopup";
 import PDFViewer from "./PdfViewer";
 import axiosTokenInstance from "../../../api_calls/api_token_instance";
+import { useNavigate } from "react-router-dom";
 
 
 // Enum for difficulty level
@@ -39,6 +40,7 @@ export interface PdfPropsDataType  {
 }
 
 const Courses = () => {
+    const navigate = useNavigate();
     const [assignedCourses, setAssignedCourses] = useState<AssignedCourseType[]>();
     const [coursePopupToggleData, setCoursePopupToggleData] = useState<CourseType | null>();
     const onClickCourseDetails = (course: CourseType) => {
@@ -89,7 +91,7 @@ const Courses = () => {
     const onClickTakeTest = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, assignedCourse: AssignedCourseType) => {
         e.preventDefault();
         e.stopPropagation();
-        alert("Take Test");
+        navigate('/test', {state: {course_id:assignedCourse.course.course_id, enroll_id: assignedCourse.enroll_id, course_name: assignedCourse.course.course_name+" ("+assignedCourse.course.difficulty_level+") " }});
     }
 
     return (

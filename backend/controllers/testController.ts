@@ -89,3 +89,92 @@ export const updateTest = async (req: CustomRequest, res: Response) => {
         res.status(500).json({ error: 'Error updating or creating the test' });
     }
 };
+
+export const getTestData = async (req: Request, res: Response) => {
+  const { course_id } = req.params;
+  
+  try {
+      const questionCount = parseInt(req.query.question_count as string) || 10; // Default to 10 if not provided
+      const questionBank = await prisma.questionBank.findUnique({
+          where: { course_id: Number(course_id) },
+          include: {
+              Questions: {
+                take: questionCount, // Limit the number of questions fetched
+                select:{
+                  question_id: true,    // Include question_id
+                  question: true,       // Include question text
+                  options: true,        // Include options
+                  isMultipleChoice: true // Include isMultipleChoice
+                  // Do not include `answers`
+                }
+            },
+          },
+      });
+
+      if (!questionBank) {
+          return res.status(404).json({ message: 'Question bank not found.' });
+      }
+      console.log(questionBank);
+      res.status(200).json({questionBank});
+  } catch (error) {
+      console.error("Error fetching test data: ", error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+export const verifyAnswers = async (req: Request, res: Response) => {
+  try {
+      const { enroll_id, test_id, userAnswers } : {enroll_id: number, test_id: string, userAnswers: {
+        question_id: number,
+        answers: number[]
+      }[]} = req.body; // Expecting an object containing test_id and an array of userAnswers
+
+      // Fetch the questions and their correct answers from the database
+      const questions = await prisma.questions.findMany({
+          where: { test_id },
+          select: {
+              question_id: true,
+              answers: true, // Retrieve correct answers
+          },
+      });
+
+      // Prepare a map of correct answers for easy lookup
+      const correctAnswersMap = new Map<number, number[]>();
+      questions.forEach(question => {
+          correctAnswersMap.set(question.question_id, question.answers);
+      });
+
+      let score = 0;
+
+      // Verify user answers
+      userAnswers.forEach(userAnswer => {
+          const correctAnswers = correctAnswersMap.get(userAnswer.question_id);
+          if (correctAnswers && JSON.stringify(correctAnswers) === JSON.stringify(userAnswer.answers)) {
+              score++; // Increment score for correct answer
+          }
+      });
+
+      // Calculate the percentage or return the raw score
+      const totalQuestions = userAnswers.length;  // TODO: Check this out
+      const result = {
+          score,
+          total: totalQuestions,
+          percentage: (score / totalQuestions) * 100,
+      };
+
+      await prisma.courseEnrollment.update({
+        where:{
+          enroll_id
+        },
+        data:{
+          test_score:result.percentage
+        }
+      });
+      console.log(result);
+      // Return the score to the frontend
+      res.status(200).json(result);
+  } catch (error) {
+      console.error('Error verifying answers: ', error);
+      res.status(500).json({ error: 'Error verifying answers' });
+  }
+};

@@ -63,7 +63,7 @@ model CourseEnrollment {
   // Relationships
   employee           Employee             @relation(fields: [emp_id], references: [emp_id], onDelete: Cascade)
   course             Course               @relation(fields: [course_id], references: [course_id], onDelete: Cascade)
-  AdminNotifications AdminNotifications[]
+  Notifications Notifications[]
   CourseEngageLogs   CourseEngageLogs[]
 
   @@unique([emp_id, course_id]) // Prevent duplicate enrollments
@@ -105,10 +105,12 @@ model Questions {
   @@unique([question_id, test_id])
 }
 
-model AdminNotifications {
+model Notifications {
   notification_id Int     @id @default(autoincrement()) // Primary Key
   enroll_id       Int // Foreign key to CourseEnrollment
   status          Boolean?
+  user_viewed     Boolean @default(false)
+  created_date    DateTime
 
   // Foreign key relation to CourseEnrollment
   CourseEnrollment CourseEnrollment @relation(fields: [enroll_id], references: [enroll_id], onDelete: Cascade)
