@@ -11,6 +11,7 @@ import EmployeeReport from "./components/Admin/EmployeeReport";
 import Courses from "./components/Employee/Courses";
 import CreateTest from "./components/Admin/CreateTest";
 import TestWindow from "./components/Employee/Courses/TestWindow";
+import Notifications from "./components/Admin/Notifications";
 
 
 
@@ -30,6 +31,7 @@ function App() {
           <Route path="/admin/addCourse" element={<AddCourse/>}/>
           <Route path="/admin/addQuestions" element={<CreateTest/>}/>
           <Route path="/admin/employeeReport" element={<EmployeeReport/>}/>
+          <Route path="/admin/notifications" element={<Notifications/>}/>
         </Route>
         <Route path="*" element={<PageNotFound/>}/>
       </Routes>

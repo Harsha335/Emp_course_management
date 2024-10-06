@@ -25,6 +25,11 @@ export const adminNavbarComponents = {
             name: 'Employee Report',  // think of making it a popup
             icons: (await import('@mui/icons-material/Assignment')).default,
             url: '/admin/employeeReport',
+        },
+        {
+            name: 'Notifications',
+            icons: (await import('@mui/icons-material/CircleNotifications')).default,
+            url: '/admin/notifications',
         }
     ]
 }

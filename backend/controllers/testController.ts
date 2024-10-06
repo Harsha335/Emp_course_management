@@ -170,6 +170,14 @@ export const verifyAnswers = async (req: Request, res: Response) => {
           test_score:result.percentage
         }
       });
+
+      await prisma.notifications.create({
+        data:{
+          enroll_id,
+          created_date: new Date()
+        }
+      });
+
       console.log(result);
       // Return the score to the frontend
       res.status(200).json(result);

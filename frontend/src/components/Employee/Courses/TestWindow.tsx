@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import axiosTokenInstance from '../../../api_calls/api_token_instance';
 import ScorePopup from './ScrorePopup';
+import { formatTime } from '../../../helper_functions/time_format';
 
 type QuestionType = {
     question_id: number;
@@ -125,13 +126,6 @@ const TestWindow: React.FC = () => {
         } catch (error) {
             console.error("Error submitting answers: ", error);
         }
-    };
-
-    const formatTime = (seconds: number) => {
-        const hrs = Math.floor(seconds / 3600);
-        const mins = Math.floor((seconds % 3600) / 60);
-        const secs = seconds % 60;
-        return `${hrs}:${mins < 10 ? `0${mins}` : mins}:${secs < 10 ? `0${secs}` : secs}`;
     };
 
     return (

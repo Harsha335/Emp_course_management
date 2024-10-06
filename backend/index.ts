@@ -5,6 +5,7 @@ import authRouter from './routes/authRouter'
 import userRouter from './routes/userRouter'
 import courseRouter from './routes/courseRouter'
 import testRouter from './routes/testRouter'
+import notificationRouter from './routes/notificationRouter'
 import employeeRouter from './routes/employeeRouter'
 
 const app = express();
@@ -24,6 +25,7 @@ app.use("/api/users", userRouter);
 app.use("/api/employees", employeeRouter);
 app.use("/api/courses", courseRouter);
 app.use("/api/test", testRouter);
+app.use("/api/notifications", notificationRouter);
 
 app.listen(process.env.SERVER_PORT, () => {
     console.log(`Server is running on localhost:${process.env.SERVER_PORT}`)
