@@ -22,11 +22,11 @@ export type CourseType = {
     difficulty_level :DifficultyLevel;      // Changed to enum
     course_img_url: string;
     course_file_url: string;
-    tags :string[];
 }
 export interface AssignedCourseType {
     enroll_id: number,
     current_page: number | null,
+    total_pages: number | null,
     test_score: number | null,
     course_certificate_url: string | null,
     course: CourseType,
@@ -98,7 +98,7 @@ const Courses = () => {
             return;
         }
         if(!assignedCourse.isTestAccessed){
-            alert("Your status is in admin survalance or course completed");
+            alert("Your exam results are under admin review. Please wait for approval.");
             return;
         }
         navigate('/test', {state: {course_id:assignedCourse.course.course_id, enroll_id: assignedCourse.enroll_id, course_name: assignedCourse.course.course_name+" ("+assignedCourse.course.difficulty_level+") " }});

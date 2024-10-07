@@ -20,6 +20,6 @@ router.post('/updateAssignedCourse', verifyUser, updateAssignedCourse);
 
 router.get('/learningPaths', verifyAdmin, getAllLearningPaths);
 router.post('/learningPaths/add', verifyAdmin, addLearningPath);
-router.post('/courseLearningPaths', verifyAdmin, getCourseLearningPaths);
+router.post('/courseLearningPaths', verifyUser, getCourseLearningPaths);
 
 export default router;

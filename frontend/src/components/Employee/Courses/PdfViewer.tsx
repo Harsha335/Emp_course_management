@@ -214,6 +214,7 @@ const PDFViewer: React.FC<PDFViewerType> = ({ data, closePDFViewer }) => {
         current_page,
         total_pages
       });
+      
       console.log(response);
     }catch(err){
       console.log("ERROR at handlePDFClose: ", err);

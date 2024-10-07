@@ -185,6 +185,7 @@ export const assignedCoursesDetails = async (req: CustomRequest, res: Response) 
       select: {
         enroll_id: true,
         current_page: true,
+        total_pages: true,
         test_score: true,
         course_certificate_url: true,
         course_id: true,

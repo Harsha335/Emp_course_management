@@ -83,7 +83,7 @@ const CourseDetailsPopup: React.FC<ParamsType> = ({ course, removePopup }) => {
           <strong>Expected Duration:</strong> {course.duration}
         </p>
 
-        {/* Tags */}
+        {/* Learning Paths */}
         <div className="text-gray-700 font-medium mb-4">
             <strong><LocalOfferIcon/> Learning Paths</strong>
             <div className='flex flex-wrap gap-2'>

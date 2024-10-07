@@ -37,6 +37,22 @@ const ribbonStyle = {
 };
 
 const CourseCard: React.FC<CourseCardProps> = ({assignedCourse, onClickTakeTest, onViewCourse}) => {
+  
+  const openCertificate = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, url: string | null) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if(url){
+      window.open(url, '_blank');
+    }
+  }
+  const percentage = Math.round(((assignedCourse.current_page || 0) / (assignedCourse.total_pages || 1)) * 100);
+  // Determine the color based on the percentage
+  const getColor = (percentage: number) => {
+    if (percentage <= 30) return 'bg-red-500'; // Red for low progress
+    if (percentage <= 60) return 'bg-yellow-500'; // Yellow for medium progress
+    if (percentage <= 80) return 'bg-blue-500'; // Blue for good progress
+    return 'bg-green-500'; // Green for high progress
+  };
   return (
     // <RibbonContainer>
         <div className="w-80 rounded-lg shadow-lg bg-white relative flex flex-col cursor-pointer transform hover:scale-105 transition-transform duration-300
@@ -59,7 +75,8 @@ const CourseCard: React.FC<CourseCardProps> = ({assignedCourse, onClickTakeTest,
             {/* </div>/ */}
 
             {/* Course Name & Button */}
-            <div className="p-2 h-[4rem] flex gap-2 justify-between items-center">
+            <div className="flex flex-col gap-2 justify-around p-2">
+              <div className='h-[3rem] flex gap-2 justify-between items-center'>
                 <div className="text-lg font-semibold line-clamp-2 overflow-hidden">{assignedCourse.course.course_name}</div>
                 <div className="flex flex-row gap-2">
                   <button onClick={(e) => onViewCourse(e, assignedCourse)}
@@ -67,13 +84,28 @@ const CourseCard: React.FC<CourseCardProps> = ({assignedCourse, onClickTakeTest,
                       >
                     <VisibilityIcon/>
                   </button>
-                  <button
-                      onClick={(e) => onClickTakeTest(e, assignedCourse)}
-                      className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-2 rounded-lg whitespace-nowrap focus:outline-none shadow-lg"
-                      >
-                      Take Test
-                  </button>
+                  {
+                    assignedCourse.course_certificate_url ? 
+                    <button
+                        onClick={(e) => openCertificate(e, assignedCourse.course_certificate_url)}
+                        className="bg-green-500 hover:bg-green-600 text-white text-sm px-3 py-2 rounded-lg whitespace-nowrap focus:outline-none shadow-lg"
+                        >
+                        Certificate
+                    </button> 
+                    :
+                    <button
+                        onClick={(e) => onClickTakeTest(e, assignedCourse)}
+                        className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-2 rounded-lg whitespace-nowrap focus:outline-none shadow-lg"
+                        >
+                        Take Test
+                    </button>
+                  }
                 </div>
+              </div>
+              {/* Progress bar */}
+              <div className="w-full bg-slate-400 h-2 rounded-lg">
+                <div className={`h-full rounded-lg ${getColor(percentage)}`} style={{ width: `${percentage}%` }} />
+              </div>
             </div>
         </div>
     // </RibbonContainer>
