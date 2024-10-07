@@ -1,18 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axiosTokenInstance from '../../../api_calls/api_token_instance';
 
-const AddCourse = () => {
-  const [tagInput, setTagInput] = useState<string>(''); // To handle the input for new tag
+type formType = {
+  course_name: string;
+  duration: string;
+  difficulty_level: string;
+  course_img: File | null;
+  course_file: File | null;
+  description: string;
+  learning_path_ids: number[] ; // ID of the selected learning path
+};
 
-  type formType = {
-    course_name: string;
-    duration: string;
-    difficulty_level: string;
-    course_img: File | null;
-    course_file: File | null;
-    description: string;
-    tags: string[];  // Change to array of strings
-  };
+const AddCourse = () => {
+  const [allLearningPaths, setAllLearningPaths] = useState<{ learning_path_id: number; path_name: string }[]>([]); // all learningPath data
+  const [newLearningPath, setNewLearningPath] = useState<{ path_name: string; description: string }>({ // for creating new learning path data
+    path_name: '',
+    description: '',
+  });
+  const [addedLearningPaths, setAddedLearningPaths] = useState<{ learning_path_id: number; path_name: string }[]>([]);  // for storing selected learning path data
+  const [selectedLearningPath, setSelectedLearningPath] = useState<string | 'new'>(''); // current selected value ('', otherLearningPath_id ,new)
 
   const [formData, setFormData] = useState<formType>({
     course_name: '',
@@ -21,32 +27,35 @@ const AddCourse = () => {
     course_img: null,
     course_file: null,
     description: '',
-    tags: [],
+    learning_path_ids: [],
   });
 
-  // Handle image upload and preview
+  // Fetch learning paths from the database
+  useEffect(() => {
+    const fetchLearningPaths = async () => {
+      try {
+        const response = await axiosTokenInstance.get('/api/courses/learningPaths');
+        setAllLearningPaths(response.data.learning_paths);
+      } catch (err) {
+        console.error('Error fetching learning paths:', err);
+      }
+    };
+
+    fetchLearningPaths();
+  }, []);
+
+  // Handle image and file changes
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
-      // console.log(event.target.files[0])
       setFormData({ ...formData, course_img: event.target.files[0] });
-      // const reader = new FileReader();
-      // reader.onload = (e) => {
-      //   if (e.target?.result) {
-      //     console.log(e.target.result)
-      //     // setFormData({ ...formData, course_img: e.target.result as string });
-      //   }
-      // };
-      // reader.readAsDataURL(event.target.files[0]);
     }
   };
+  
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
-      setFormData((prev) => ({
-          ...prev,
-          course_file: event.target.files[0], // Save the selected course file
-      }));
+      setFormData((prev) => ({ ...prev, course_file: event.target.files ? event.target.files[0] : null}));
     }
-};
+  };
 
   // Handle text input changes
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -54,44 +63,76 @@ const AddCourse = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  // Add new tag
-  const addTag = () => {
-    if (tagInput.trim() !== '') {
-      setFormData({ ...formData, tags: [...formData.tags, tagInput.trim()] });
-      setTagInput(''); // Clear the input after adding
+  // Handle Learning Path selection
+  const handleLearningPathChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = event.target;
+    setSelectedLearningPath(value);
+    if (value !== 'new' && value !== '') {
+      setFormData(prev => ({ ...formData, learning_path_ids: [...prev.learning_path_ids,parseInt(value)] }));
+      const path_name = allLearningPaths.find(path => path.learning_path_id === parseInt(value))?.path_name;
+      setAddedLearningPaths((prev) => [...prev, {learning_path_id: parseInt(value), path_name: path_name ? path_name : ''}]);
     }
   };
 
-  // Remove tag by index
-  const removeTag = (index: number) => {
-    const newTags = formData.tags.filter((_, i) => i !== index);
-    setFormData({ ...formData, tags: newTags });
+  // Handle new learning path input change
+  const handleNewLearningPathChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = event.target;
+    setNewLearningPath((prev) => ({ ...prev, [name]: value }));
+  };
+  // Function to remove a learning path from addedLearningPaths
+  const handleRemoveLearningPath = (learning_path_id: number) => {
+    setAddedLearningPaths((prev) => prev.filter((learning_path) => learning_path.learning_path_id !== learning_path_id));
+  };
+
+
+  // Save new learning path
+  const handleSaveNewLearningPath = async () => {
+    if (newLearningPath.path_name && newLearningPath.description) {
+      try {
+        // Save new learning path to the server
+        const learningPathResponse = await axiosTokenInstance.post('/api/courses/learningPaths/add', newLearningPath);
+        const newLearningPathId: number = learningPathResponse.data.learning_path_id;
+
+        // Add new learning path to the addedLearningPaths state
+        setAddedLearningPaths((prev) => [...prev, {learning_path_id: newLearningPathId, path_name: newLearningPath.path_name}]);
+        
+        // Reset new learning path inputs
+        setNewLearningPath({ path_name: '', description: '' });
+        setSelectedLearningPath('');
+        // Update learning paths list
+        setAllLearningPaths((prev) => ([...prev, { learning_path_id: newLearningPathId, path_name: newLearningPath.path_name }]));
+      } catch (err) {
+        console.error('Error saving learning path:', err);
+      }
+    }
   };
 
   const handleSubmitForm = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    try{
+
+    try {
       const formDataToSend = new FormData();
-      // Append the rest of the form data
       formDataToSend.append('course_name', formData.course_name);
       formDataToSend.append('duration', formData.duration);
       formDataToSend.append('difficulty_level', formData.difficulty_level);
       formDataToSend.append('description', formData.description);
-      // Append the tags array as JSON
-      formData.tags.forEach(item => formDataToSend.append("tags[]", item));
-      // Append the image file directly
+      formData.learning_path_ids.forEach(item => formDataToSend.append("learning_path_ids[]", item.toString()));
+      // formDataToSend.append('learning_path_ids[]', formData.learning_path_ids?.toString() || '');
+
+      // Append image and file
       if (formData.course_img) {
-        formDataToSend.append('course_img', formData.course_img); // course_img is of type File
+        formDataToSend.append('course_img', formData.course_img);
       }
-      // Append the course file directly
       if (formData.course_file) {
-        formDataToSend.append('course_file', formData.course_file); // course_file is of type File
+        formDataToSend.append('course_file', formData.course_file);
       }
-      console.log(formDataToSend.get('course_img'));
-      await axiosTokenInstance.post('/api/courses/addCourse', formData,{
-        headers: {
-          "Content-Type": "multipart/form-data",
-        }});
+
+      // Submit course form
+      await axiosTokenInstance.post('/api/courses/addCourse', formDataToSend, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      // Reset form
       setFormData({
         course_name: '',
         duration: '',
@@ -99,21 +140,23 @@ const AddCourse = () => {
         course_img: null,
         course_file: null,
         description: '',
-        tags: [],
+        learning_path_ids: [],
       });
-    }catch(err){
-        console.log("Error at submiting course: ", err)
+      setSelectedLearningPath('');
+      setNewLearningPath({ path_name: '', description: '' });
+      setAddedLearningPaths([]);
+
+    } catch (err) {
+      console.error('Error submitting course:', err);
     }
-  }
+  };
 
   return (
     <div className="flex justify-center items-center h-screen">
       <div className="flex flex-col md:flex-row w-3/4 border-2 border-gray-300 rounded-lg p-8 gap-6 bg-white shadow-lg">
-        
         {/* Left side: Form */}
         <div className="w-full md:w-1/2">
           <h2 className="text-2xl font-bold mb-4">Add Course</h2>
-
           {/* Title Input */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">Title</label>
@@ -169,72 +212,100 @@ const AddCourse = () => {
             </select>
           </div>
 
-          {/* Image Upload */}
+          {/* Learning Path Dropdown */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Upload Course Image</label>
-            <input
-              type="file"
-              accept="image/png, image/jpeg, image/jpg"
-              onChange={handleImageChange}
-              className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-            />
+            <label className="block text-sm font-medium text-gray-700">Select Learning Path</label>
+            <select
+              value={selectedLearningPath}
+              onChange={handleLearningPathChange}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+            >
+              <option value="">-- Select Learning Path --</option>
+              {allLearningPaths.map((path) => (
+                <option key={path.learning_path_id} value={path.learning_path_id}>
+                  {path.path_name}
+                </option>
+              ))}
+              <option value="new">Add New Learning Path</option>
+            </select>
           </div>
 
-          {/* PDF upload */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Upload Course File (PDF)</label>
-            <input
-                type="file"
-                accept="application/pdf"
-                onChange={handleFileChange}
-                className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-            />
-        </div>
-
-          {/* Tags Section */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Tags</label>
-            <div className="flex gap-2 mb-2">
+          {/* Show fields to add a new learning path */}
+          {selectedLearningPath === 'new' && (
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">New Learning Path Name</label>
               <input
                 type="text"
-                className="p-2 border border-gray-300 rounded-md flex-grow"
-                placeholder="Add a tag"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
+                name="path_name"
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                placeholder="Learning Path Name"
+                value={newLearningPath.path_name}
+                onChange={handleNewLearningPathChange}
+              />
+              <label className="block text-sm font-medium text-gray-700 mt-2">Description</label>
+              <textarea
+                name="description"
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                rows={2}
+                placeholder="Learning Path Description"
+                value={newLearningPath.description}
+                onChange={handleNewLearningPathChange}
               />
               <button
-                type="button"
-                className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
-                onClick={addTag}
+                className="mt-2 p-2 bg-blue-600 text-white rounded-md"
+                onClick={handleSaveNewLearningPath}
               >
-                Add
+                Save Learning Path
               </button>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {formData.tags.map((tag, index) => (
-                <div
-                  key={index}
-                  className="flex items-center bg-blue-100 text-blue-700 rounded-md px-3 py-1"
+          )}
+
+        {/* Inside your AddCourse component, update the rendering of added learning paths */}
+        <div className="flex flex-wrap gap-4">
+            {addedLearningPaths.map((learning_path) => (
+              <div
+                key={learning_path.learning_path_id}
+                className="flex items-center bg-blue-100 text-blue-700 rounded-md px-3 py-1"
+              >
+                {learning_path.path_name}
+                <button
+                  type="button"
+                  className="ml-2 text-red-500 hover:text-red-700"
+                  onClick={() => handleRemoveLearningPath(learning_path.learning_path_id)}
                 >
-                  {tag}
-                  <button
-                    type="button"
-                    className="ml-2 text-red-500 hover:text-red-700"
-                    onClick={() => removeTag(index)}
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
+                  ×
+                </button>
+              </div>
+            ))}
           </div>
 
-          {/* Save Button */}
-          <div className="mt-6">
-            <button className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600" onClick={e => handleSubmitForm(e)}>
-              Save
-            </button>
+          {/* Image Upload */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Upload Image</label>
+            <input
+              type="file"
+              onChange={handleImageChange}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+            />
           </div>
+
+          {/* File Upload */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Upload Course File</label>
+            <input
+              type="file"
+              onChange={handleFileChange}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div>
+
+          {/* Submit Button */}
+          <button
+            className="mt-4 p-2 bg-green-600 text-white rounded-md"
+            onClick={handleSubmitForm}
+          >
+            Submit Course
+          </button>
         </div>
 
         {/* Right side: Image Preview */}
@@ -251,6 +322,8 @@ const AddCourse = () => {
             )}
           </div>
         </div>
+
+
       </div>
     </div>
   );

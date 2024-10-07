@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 type ParamsType = {
@@ -39,7 +39,7 @@ const ScorePopup: React.FC<ParamsType> = ({data}) => {
                 <div className="flex justify-center mt-6">
                     <button 
                         className="bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition duration-300" 
-                        onClick={() => {navigate(-1);}}
+                        onClick={() => {window.location.reload();navigate(-1);}}
                     >
                         Close
                     </button>

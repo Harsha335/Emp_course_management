@@ -29,7 +29,9 @@ export interface AssignedCourseType {
     current_page: number | null,
     test_score: number | null,
     course_certificate_url: string | null,
-    course: CourseType
+    course: CourseType,
+    isInQuestionBank: boolean,
+    isTestAccessed: boolean
 }
 
 export interface PdfPropsDataType  {
@@ -54,7 +56,7 @@ const Courses = () => {
         const fetchCourses = async () => {
             try{
                 const response = await axiosTokenInstance.get("/api/courses/assignedCoursesDetails");
-                // console.log(response.data.coursesAssigned)
+                console.log(response.data)
                 setAssignedCourses(response.data.coursesAssigned);
             }catch(err){
                 console.log("Error in fetching course data (frontend)");
@@ -91,6 +93,14 @@ const Courses = () => {
     const onClickTakeTest = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, assignedCourse: AssignedCourseType) => {
         e.preventDefault();
         e.stopPropagation();
+        if(!assignedCourse.isInQuestionBank){
+            alert("No Questions Recorded");
+            return;
+        }
+        if(!assignedCourse.isTestAccessed){
+            alert("Your status is in admin survalance or course completed");
+            return;
+        }
         navigate('/test', {state: {course_id:assignedCourse.course.course_id, enroll_id: assignedCourse.enroll_id, course_name: assignedCourse.course.course_name+" ("+assignedCourse.course.difficulty_level+") " }});
     }
 

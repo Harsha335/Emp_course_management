@@ -22,7 +22,6 @@ export type CourseType = {
     difficulty_level :DifficultyLevel;      // Changed to enum
     course_img_url: string;
     course_file_url: string;
-    tags :string[];
 }
 
 const AllCourses = () => {

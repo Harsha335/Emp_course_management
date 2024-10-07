@@ -1,9 +1,16 @@
 import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
 import { JwtPayloadType } from '../utils/jwtHelper';
-import { createCanvas, loadImage } from 'canvas';
+import { createCanvas, loadImage, registerFont } from 'canvas';
 import cloudinary from '../utils/cloudinary';
-import path from 'path';
+// import path from 'path';
+import fs from 'fs';
+// import fontkit from 'fontkit';
+// Register the Algerian font with canvas
+const path = require('path');
+const fontPath = path.join(__dirname, '../../frontend/public/Algerian-Regular.ttf');
+registerFont(fontPath, { family: 'Algerian' });
+
 require('dotenv').config();
 
 interface CustomRequest extends Request {
@@ -63,48 +70,120 @@ export const getAdminNotifications = async (req: CustomRequest, res: Response) =
     }
 }
 
-// Function to generate the certificate image with an elegant design
+export const getUserNotifications = async (req: CustomRequest, res: Response) => {
+    try {
+        const user_id = req.user?.user_id || ''; // Default to an empty string if no user_id
+        
+        // Fetch notifications
+        const notifications = await prisma.notifications.findMany({
+            where: {
+                status: { not: null },
+                user_viewed: {equals: false}
+            },
+            select: {
+                notification_id: true,
+                created_date: true,
+                status: true, 
+                CourseEnrollment: {
+                    select:{
+                        enroll_id: true,
+                        emp_id: true,
+                        course_certificate_url: true,
+                        employee: { // Get employee name
+                            select: {
+                                emp_name: true,
+                            },
+                        },
+                        course: { // Get course details
+                            select: {
+                                course_name: true,
+                                difficulty_level: true,
+                            },
+                        }
+                    }
+                }
+            }
+        });
+
+        // Filter enrollments for the specific user
+        const filteredNotifications = notifications.filter(notification => (
+            notification.CourseEnrollment.emp_id === user_id
+        ));
+
+
+
+        console.log("data: ", filteredNotifications);
+        res.status(200).json(filteredNotifications);
+    } catch (err) {
+        console.log("Error at getUserNotifications: ", err);
+        res.status(500).json({ error: 'Error fetching getUserNotifications' });
+    }
+};
+
+export const markAsRead = async (req: CustomRequest, res: Response) => {
+    try{
+        const {notification_ids}:{notification_ids:  number[]} = req.body;
+        console.log(notification_ids)
+        // Create an array of update promises
+        const updatePromises = notification_ids.map(notification_id => {
+            return prisma.notifications.update({
+                where: { notification_id }, // Assuming notification.id contains the notification ID
+                data: {
+                    user_viewed: true // Update the field as needed
+                }
+            });
+        });
+
+        // Execute all update promises in parallel
+        await Promise.all(updatePromises);
+        console.log('All notifications updated successfully.');
+
+        res.status(200).json({message: 'Marked as read!'});
+    }catch(err){
+        console.log("Error at markAsRead: ", err);
+        res.status(500).json({error: 'Error at mark as read'});
+    }
+}
+
+
 const generateElegantCertificateImage = async (emp_name: string, course_name: string, test_score: number) => {
-    const canvas = createCanvas(1000, 700); // Adjust size based on your template
+    // Use the correct dimensions for your canvas
+    const canvas = createCanvas(1090, 692);
     const ctx = canvas.getContext('2d');
 
-    // Load a certificate background template image
-    // const backgroundImage = await loadImage('path_to_your_template_image'); // Replace with your actual template file
-    // ctx.drawImage(backgroundImage, 0, 0, 1000, 700);
+    // Load the certificate background template image
+    const backgroundImage = await loadImage('https://res.cloudinary.com/deppcolt3/image/upload/v1728276743/Screenshot_2024-10-07_100904_pumndr.png'); // Update as needed
+    ctx.drawImage(backgroundImage, 0, 0, 1090, 692); // Match the canvas size
 
-    // Customize colors and fonts for the certificate design
-    ctx.fillStyle = '#001F54'; // Royal blue shade for main text
-    ctx.font = 'bold 36px "Times New Roman"';
+    // Set white color for all text
+    ctx.fillStyle = '#FFFFFF';
+
+    // Draw the main title
+    ctx.font = "Sans Italic Extra-Condensed Not-Rotated 24px"; // Use the registered Algerian font
     ctx.textAlign = 'center';
+    ctx.fillText('Certificate of Completion', 600, 150); // Centered with respect to canvas width
 
-    // Draw main title
-    ctx.fillText('Certificate of Completion', 500, 150);
+    // Add elegant text about the certificate
+    ctx.font = "Sans Not-Rotated 24px"; // Clean, elegant font for the description
+    ctx.fillText('This certificate is awarded to', 580, 240); // Centered text
 
-    // Add elegant text about the certificate, positioning the name and details centrally
-    ctx.font = 'italic 24px "Arial"';
-    ctx.fillText(`This certificate is awarded to`, 500, 240);
-    
     // Add Employee's Name (larger and bold)
-    ctx.font = 'bold 42px "Georgia"';
-    ctx.fillStyle = '#8B008B'; // Royal purple shade
-    ctx.fillText(`${emp_name}`, 500, 300);
+    ctx.font = "Sans Bold Extra-Condensed Not-Rotated 44px"; // Classic, professional look
+    ctx.fillText(emp_name, 580, 300); // Centered text
 
     // Add course name and score
-    ctx.font = 'italic 24px "Arial"';
-    ctx.fillStyle = '#4B0082'; // Royal pink shade
-    ctx.fillText(`For successfully completing the course: ${course_name}`, 500, 350);
-    ctx.fillText(`with an outstanding score of ${test_score}%`, 500, 400);
+    ctx.font = "Sans Bold Extra-Condensed Not-Rotated 22px";
+    ctx.fillText(`For successfully completing the course: ${course_name}`, 580, 350); // Centered text
+    ctx.fillText(`with an outstanding score of ${test_score}%`, 580, 400); // Centered text
 
     // Add bottom-right section for the signature and logo
-    // https://res.cloudinary.com/deppcolt3/image/upload/v1728241628/JMAN-logo_ufuicp.png
-    // https://res.cloudinary.com/deppcolt3/image/upload/v1728241629/B7WaDf7aXrm4dcXjA0vImxyFZW91685699091497_200x200_dba9ut.png
-    const logo = await loadImage('https://res.cloudinary.com/deppcolt3/image/upload/v1728241628/JMAN-logo_ufuicp.png');
-    ctx.drawImage(logo, 700, 500, 200, 100); // Adjust positioning as necessary
+    // Uncomment and adjust position as necessary when adding the logo
+    // const logo = await loadImage('https://res.cloudinary.com/deppcolt3/image/upload/v1728241628/JMAN-logo_ufuicp.png');
+    // ctx.drawImage(logo, 700, 500, 200, 100); // Ensure the logo fits properly
 
-    ctx.font = 'bold 22px "Arial"';
-    ctx.fillStyle = '#001F54'; // Royal blue shade for the footer text
-    ctx.fillText('Certificate approved by:', 500, 550);
-    ctx.fillText('JMAN Group', 500, 590);
+    ctx.font = "Sans Not-Rotated 22px"; // Verdana for the footer text
+    ctx.fillText('Certificate approved by:', 580, 550); // Centered text
+    ctx.fillText('JMAN Group', 580, 590); // Centered text
 
     // Convert the canvas to a buffer (image)
     const buffer = canvas.toBuffer('image/png');
@@ -118,6 +197,7 @@ const generateElegantCertificateImage = async (emp_name: string, course_name: st
     // Return Cloudinary URL of the uploaded image
     return cloudinary_img.url;
 };
+
 
 // Function to handle the generation and updating of notification
 export const updateNotification = async (req: Request, res: Response) => {

@@ -82,7 +82,6 @@ export const addCourse = async (req: CustomRequest, res: Response) => {
                 difficulty_level,
                 course_img_url: cloudinary_img.url,
                 course_file_url: pdfPublicUrl, // Save the course file URL
-                tags,
             },
         });
 
@@ -172,31 +171,71 @@ export const getPDF =  async (req: CustomRequest, res: Response) => {
 };
 
 export const assignedCoursesDetails = async (req: CustomRequest, res: Response) => {
-  try{
+  try {
     const user_id = req.user?.user_id;
-    if(!user_id){
-      res.status(400).json({message: "Unverified user"});
-    }else{
-      const coursesAssigned = await prisma.courseEnrollment.findMany({
-        where: {
-          emp_id: user_id
-        },
-        select:{
-          enroll_id: true,
-          current_page: true,
-          test_score: true,
-          course_certificate_url: true,
-          course: true
-        }
-      });
-      // console.log("coursesAssigned: ",coursesAssigned);
-      res.status(200).json({coursesAssigned});
+    if (!user_id) {
+      return res.status(400).json({ message: "Unverified user" });
     }
-  }catch(error){
+
+    // Fetch course enrollments for the user
+    const coursesAssigned = await prisma.courseEnrollment.findMany({
+      where: {
+        emp_id: user_id
+      },
+      select: {
+        enroll_id: true,
+        current_page: true,
+        test_score: true,
+        course_certificate_url: true,
+        course_id: true,
+        course: true
+      }
+    });
+
+    // Prepare results with test_accessed key
+    const results = await Promise.all(coursesAssigned.map(async course => {
+      // Check if the course_id exists in the question bank
+      const isInQuestionBank: boolean = (await prisma.questionBank.findUnique({
+        where: {
+          course_id: course.course_id
+        }
+      })) !== null;
+
+      let isTestAccessed: boolean = false;
+      if (isInQuestionBank) {
+        // Check if there is any notification with status not true for this enroll_id
+        const records = (await prisma.notifications.findMany({
+          where: {
+            enroll_id: course.enroll_id,
+            OR: [
+              { status: null },
+              { status: true }
+            ]
+          },
+          orderBy: {
+            created_date: 'desc',
+          },
+          take: 1,
+        }));
+        isTestAccessed = records.length === 0;
+        console.log(course.enroll_id,records,records.length)
+      }
+
+      return {
+        ...course,
+        isInQuestionBank,
+        isTestAccessed
+      };
+    }));
+
+    console.log("Result: ", results);
+    res.status(200).json({ coursesAssigned: results });
+  } catch (error) {
     console.error('Error @ fetching assignedCourses:', error);
     res.status(500).send('Error @ fetching assignedCourses');
   }
-}
+};
+
 
 export const updateAssignedCourse = async (req: CustomRequest, res: Response) => {
   try{
@@ -227,5 +266,47 @@ export const updateAssignedCourse = async (req: CustomRequest, res: Response) =>
   }catch(error){
     console.error('Error @ updateAssignedCourse:', error);
     res.status(500).send('Error @ updating CourseEngageLogs');
+  }
+}
+
+export const getAllLearningPaths = async (req: CustomRequest, res: Response) => {
+  try{
+    const learning_paths = await prisma.learningPath.findMany();
+    res.status(200).json({learning_paths});
+  }catch(err){
+    console.log("Error @ getAllLearningPaths: ", err);
+    res.status(500).json({messsage: 'Error at featching learning_paths'});
+  }
+}
+
+export const addLearningPath = async (req: CustomRequest, res: Response) => {
+  try{
+    const {path_name, description} = req.body;
+    const newLearningPath = await prisma.learningPath.create({
+      data: {path_name, description}
+    });
+    res.status(200).json({newLearningPath});
+  }catch(err){
+    console.log("Error @ getAllLearningPaths: ", err);
+    res.status(500).json({messsage: 'Error at featching learning_paths'});
+  }
+}
+
+export const getCourseLearningPaths = async (req: CustomRequest, res: Response) => {
+  try{
+    const {course_id} = req.body;
+    // console.log(course_id)
+    const learning_paths = await prisma.learningPathMap.findMany({
+      where:{
+        course_id: Number(course_id)
+      },
+      select:{
+        learningPath:true
+      }
+    });
+    res.status(200).json({learning_paths});
+  }catch(err) {
+    console.log("Error @ getCourseLearningPaths: ", err);
+    res.status(500).json({messsage: 'Error at featching learning_path'});
   }
 }

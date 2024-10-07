@@ -33,12 +33,12 @@ model Course {
   duration         String
   difficulty_level DifficultyLevel // Enum for difficulty level
   course_img_url   String
-  tags             String[]
   course_file_url  String
 
   // Relationships
   CourseEnrollment CourseEnrollment[]
   QuestionBank    QuestionBank? // Made optional
+  LearningPathMap  LearningPathMap[] // Many-to-many relationship
 
   @@unique([course_name, difficulty_level])
 }
@@ -49,6 +49,26 @@ enum DifficultyLevel {
   BEGINNER
   INTERMEDIATE
   EXPERT
+}
+
+model LearningPath {
+  learning_path_id Int    @id @default(autoincrement()) // Primary Key
+  description       String
+  path_name        String @unique // Name of the learning path
+
+  // Relationships
+  LearningPathMap LearningPathMap[] // Many-to-many relationship
+}
+
+model LearningPathMap {
+  course_id        Int
+  learning_path_id Int
+
+  // Relationships
+  course           Course        @relation(fields: [course_id], references: [course_id], onDelete: Cascade)
+  learningPath     LearningPath  @relation(fields: [learning_path_id], references: [learning_path_id], onDelete: Cascade)
+
+  @@id([course_id, learning_path_id]) // Composite primary key
 }
 
 model CourseEnrollment {
@@ -108,7 +128,7 @@ model Questions {
 model Notifications {
   notification_id Int     @id @default(autoincrement()) // Primary Key
   enroll_id       Int // Foreign key to CourseEnrollment
-  status          Boolean?
+  status          Boolean?  // accepted(true), rejected(false)
   user_viewed     Boolean @default(false)
   created_date    DateTime
 

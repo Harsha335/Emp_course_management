@@ -11,7 +11,8 @@ import EmployeeReport from "./components/Admin/EmployeeReport";
 import Courses from "./components/Employee/Courses";
 import CreateTest from "./components/Admin/CreateTest";
 import TestWindow from "./components/Employee/Courses/TestWindow";
-import Notifications from "./components/Admin/Notifications";
+import AdminNotifications from "./components/Admin/Notifications";
+import Notifications from "./components/Employee/Notifications";
 
 
 
@@ -23,6 +24,7 @@ function App() {
         <Route element={<EmpProtectedRoute/>}>
           <Route path="/dashboard" element={<EmployeeDashboard/>}/>
           <Route path="/courses" element={<Courses/>}/>
+          <Route path="/notifications" element={<Notifications/>}/>
         </Route>
           <Route path="/test" element={<TestWindow/>}/>
         <Route element={<AdminProtectedRoute/>}>
@@ -31,7 +33,7 @@ function App() {
           <Route path="/admin/addCourse" element={<AddCourse/>}/>
           <Route path="/admin/addQuestions" element={<CreateTest/>}/>
           <Route path="/admin/employeeReport" element={<EmployeeReport/>}/>
-          <Route path="/admin/notifications" element={<Notifications/>}/>
+          <Route path="/admin/notifications" element={<AdminNotifications/>}/>
         </Route>
         <Route path="*" element={<PageNotFound/>}/>
       </Routes>

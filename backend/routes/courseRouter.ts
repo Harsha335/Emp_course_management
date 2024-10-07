@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addCourse, allCourses, courseEmployeeRelation, courseEmployeeRelationUpdate, getPDF, assignedCoursesDetails, updateAssignedCourse } from "../controllers/courseController";
+import { addCourse, allCourses, courseEmployeeRelation, courseEmployeeRelationUpdate, getPDF, assignedCoursesDetails, updateAssignedCourse, getAllLearningPaths, addLearningPath, getCourseLearningPaths } from "../controllers/courseController";
 import { verifyAdmin, verifyUser } from "../middleware/verifyUser";
 // Multer configuration
 import multer from 'multer';
@@ -17,5 +17,9 @@ router.post('/getPdf', verifyUser, getPDF);
 
 router.get('/assignedCoursesDetails', verifyUser, assignedCoursesDetails);
 router.post('/updateAssignedCourse', verifyUser, updateAssignedCourse);
+
+router.get('/learningPaths', verifyAdmin, getAllLearningPaths);
+router.post('/learningPaths/add', verifyAdmin, addLearningPath);
+router.post('/courseLearningPaths', verifyAdmin, getCourseLearningPaths);
 
 export default router;
