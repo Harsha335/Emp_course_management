@@ -10,63 +10,47 @@ import LineChart from './LineChart';
 
 const EmployeeDashboard = () => {
   
-  const [empCount, setEmpCount] = useState(0);
-  const [empDeltaPer, setEmpDeltaPer] = useState(0);
+  const [totalCoursesAssigned, setTotalCoursesAssigned] = useState<number >(0);
+  const [totalCoursesAssignedDeltaPer, setTotalCoursesAssignedDeltaPer] = useState<number >(0);
   
-  const [coursesCount, setCoursesCount] = useState(0);
-  const [coursesDeltaPer, setCoursesDeltaPer] = useState(0);
+  const [totalCertificates, settotalCertificates] = useState<number >(0);
+  const [totalCertificatesDeltaPer, setTotalCertificatesDeltaPer] = useState<number >(0);
   
-  const [avgTimeSpent, setAvgTimeSpent] = useState(0);
-  const [avgTimeSpentDeltaPer, setAvgTimeSpentDeltaPer] = useState(0);
+  const [avgTestScore, setAvgTestScore] = useState<number>(0);
+  const [avgTestScoreDeltaPer, setAvgTestScoreDeltaPer] = useState<number>(0);
+
+  const [avgTimeSpent, setAvgTimeSpent] = useState<number >(0);
+  const [avgTimeSpentDeltaPer, setAvgTimeSpentDeltaPer] = useState<number>(0);
   
-  const [courseEnrollmentCount, setCourseEnrollmentCount] = useState(0);
-  const [courseEnrollmentDeltaPer, setCourseEnrollmentDeltaPer] = useState(0);
 
   useEffect(()=>{
-    const empCount = async () => {
+    const getData = async () => {
       try{
-        const response = await axiosTokenInstance.get("/api/employees/empCount");
-        // console.log(response);
-        setEmpCount(response.data?.empCount);
-        setEmpDeltaPer((response.data?.empDeltaPer).toFixed(2));
+        const response = await axiosTokenInstance.get("/api/employees/getEmployeeStatistics");
+        type resType = {
+          curr: number,
+          prev: number
+        }
+        type resNullType = {
+          curr: number | null,
+          prev: number | null
+        }
+        const {totalCoursesAssigned, totalCertificates, avgTestScore, avgTimeSpent} : {totalCoursesAssigned : resType, totalCertificates : resType, avgTestScore : resNullType, avgTimeSpent : resNullType} = response.data;
+        setTotalCoursesAssigned(totalCoursesAssigned.curr);
+        setTotalCoursesAssignedDeltaPer( Number((((totalCoursesAssigned.curr - totalCoursesAssigned.prev)/totalCoursesAssigned.curr)*100).toFixed(2)));
+        settotalCertificates(totalCertificates.curr);
+        setTotalCertificatesDeltaPer( Number((((totalCertificates.curr - totalCertificates.prev)/totalCertificates.curr)*100).toFixed(2)));
+        setAvgTestScore(avgTestScore?.curr || 0);
+        const deltaAvgTestScore = avgTestScore.curr === null ? 0 : avgTestScore.prev === null? avgTestScore.curr : (((avgTestScore.curr - avgTestScore.prev)/avgTestScore.curr)*100).toFixed(2);
+        setAvgTestScoreDeltaPer( Number(deltaAvgTestScore));
+        setAvgTimeSpent(avgTimeSpent?.curr || 0);
+        const deltaAvgTimeSpent = avgTimeSpent.curr === null ? 0 : avgTimeSpent.prev === null? avgTimeSpent.curr : (((avgTimeSpent.curr - avgTimeSpent.prev)/avgTimeSpent.curr)*100).toFixed(2);
+        setAvgTimeSpentDeltaPer( Number(deltaAvgTimeSpent));
       }catch(err){
-        console.log("Error at admin/empCount: ", err);
+        console.log("Error at admin/getEmployeeStatistics: ", err);
       }
     }
-    const coursesCountIncrease = async () => {
-      try{
-        const response = await axiosTokenInstance.get("/api/courses/coursesCountIncrease");
-        // console.log(response);
-        setCoursesCount(response.data?.courseCount);
-        setCoursesDeltaPer((response.data?.courseDeltaPer).toFixed(2));
-      }catch(err){
-        console.log("Error at admin/coursesCountIncrease: ", err);
-      }
-    }
-    const avgTimeSpent = async () => {
-      try{
-        const response = await axiosTokenInstance.get("/api/courses/avgTimeSpentIncrease");
-        // console.log(response);
-        setAvgTimeSpent(response.data?.avgTimeSpent.toFixed(2));
-        setAvgTimeSpentDeltaPer((response.data?.avgTimeSpentDeltaPer).toFixed(2));
-      }catch(err){
-        console.log("Error at admin/avgTimeSpent: ", err);
-      }
-    }
-    const courseEnrollmentIncrease = async () => {
-      try{
-        const response = await axiosTokenInstance.get("/api/courses/courseEnrollmentIncrease");
-        // console.log(response);
-        setCourseEnrollmentCount(response.data?.courseEnrollmentCount);
-        setCourseEnrollmentDeltaPer((response.data?.courseEnrollmentDeltaPer).toFixed(2));
-      }catch(err){
-        console.log("Error at admin/courseEnrollmentIncrease: ", err);
-      }
-    }
-    empCount();
-    coursesCountIncrease();
-    avgTimeSpent();
-    courseEnrollmentIncrease();
+    getData();
   },[]);
 
 
@@ -92,64 +76,74 @@ const EmployeeDashboard = () => {
   useEffect(()=>{
     const getAvgTimeSpent = async () => {
       try{
-        const response = await axiosTokenInstance.get('/api/courses/avgTimeSpentForPeriods');
+        const response = await axiosTokenInstance.get('/api/courses/empAvgTimeSpentForPeriods');
         console.log(response)
         setAvgTimeSpentPeriod(response.data);
       }catch(err){
-        console.log("Error at admin/getAvgTimeSpent: ", err);
+        console.log("Error at emp/getAvgTimeSpent: ", err);
       }
     }
     getAvgTimeSpent();
   },[]);
 
-  type TrendingCouresType = {
-    id: number,
-    img_url: string,
-    name: string,
-    certificates_count: number
-  }
-  const [trendingCoures, setTrendingCoures] = useState<TrendingCouresType[]>([]);
-  const [limit, setLimit] = useState(5);
-  const putLimit = (value : number) => {
-    setLimit(value);
-  }
-  useEffect(() => {
-    const getTrendingCoures = async () => {
-      try{
-        const response = await axiosTokenInstance.get(`/api/courses/topTrendingCoures/?limit=${limit}`);
-        setTrendingCoures(response.data);
-      }catch(err){
-        console.log("Error at admin/getTopProducts: ", err);
-      }
-    }
-    getTrendingCoures();
-  },[limit]);
+  // type TrendingCouresType = {
+  //   id: number,
+  //   img_url: string,
+  //   name: string,
+  //   certificates_count: number
+  // }
+  // const [trendingCoures, setTrendingCoures] = useState<TrendingCouresType[]>([]);
+  // const [limit, setLimit] = useState(5);
+  // const putLimit = (value : number) => {
+  //   setLimit(value);
+  // }
+  // useEffect(() => {
+  //   const getTrendingCoures = async () => {
+  //     try{
+  //       const response = await axiosTokenInstance.get(`/api/courses/topTrendingCoures/?limit=${limit}`);
+  //       setTrendingCoures(response.data);
+  //     }catch(err){
+  //       console.log("Error at admin/getTopProducts: ", err);
+  //     }
+  //   }
+  //   getTrendingCoures();
+  // },[limit]);
 
   return (
-        <div className='flex-1 flex flex-col gap-8 p-4 min-h-screen'>
+        <div className='flex-1 flex flex-col gap-8 p-4'>
             <div className='flex flex-row flex-wrap gap-5 justify-around'>
-                <DashboardCard title={"Employees Count"} value={empCount} delta_per={empDeltaPer} color="indigo" Icon={PeopleIcon}/>
-                <DashboardCard title="Courses Count" value={coursesCount} delta_per={coursesDeltaPer} color="teal" Icon={BookIcon}/>
-                <DashboardCard title="Avg Time Spent" value={avgTimeSpent} delta_per={avgTimeSpentDeltaPer} color="orange" Icon={AccessTimeFilledIcon}/>
-                <DashboardCard title="Courses Enrollment" value={courseEnrollmentCount} delta_per={courseEnrollmentDeltaPer} color="green" Icon={SubscriptionsIcon}/>
+                <DashboardCard title={"Employees Count"} value={totalCoursesAssigned} delta_per={totalCoursesAssignedDeltaPer} color="indigo" Icon={PeopleIcon}/>
+                <DashboardCard title="Courses Count" value={totalCertificates} delta_per={totalCertificatesDeltaPer} color="teal" Icon={BookIcon}/>
+                <DashboardCard title="Avg Time Spent" value={avgTestScore} delta_per={avgTestScoreDeltaPer} color="orange" Icon={AccessTimeFilledIcon}/>
+                <DashboardCard title="Courses Enrollment" value={avgTimeSpent} delta_per={avgTimeSpentDeltaPer} color="green" Icon={SubscriptionsIcon}/>
             </div>
-            <div className='  flex flex-col xl:flex-row gap-4'>
-                <div className='flex-1 bg-white rounded-xl drop-shadow-lg p-4 flex flex-col '>
-                    <div className='flex flex-row justify-between'>
-                      <div className='font-semibold text-2xl'>Average Time Spent</div>
-                      <div>
-                        <select className='p-1 cursor-pointer' onChange={(e) => putSelectedRange(e.target.value)}>
-                          <option value="avgTimePerDayLast30Days">Past 30 days</option>
-                          <option value="avgTimePerMonthLast6Months">Past 6 months</option>
-                          <option value="avgTimePerMonthLastYear">Past 12 months</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div className='flex-1 flex items-center justify-center'>
-                      {avgTimeSpentPeriod && avgTimeSpentPeriod[selectedRange] && <LineChart data={avgTimeSpentPeriod[selectedRange]} timeUnit={timeUnit} tooltipTitle={tooltipTitle} displayXscale={displayXscale}/>}
-                    </div>
+            {/* <div className='  flex flex-col xl:flex-row gap-4'> */}
+            <div className='w-full bg-white rounded-xl drop-shadow-lg p-4 flex flex-col'>
+              <div className='flex flex-row justify-between'>
+                <div className='font-semibold text-2xl'>Average Time Spent</div>
+                <div>
+                  <select className='p-1 cursor-pointer' onChange={(e) => putSelectedRange(e.target.value)}>
+                    <option value="avgTimePerDayLast30Days">Past 30 days</option>
+                    <option value="avgTimePerMonthLast6Months">Past 6 months</option>
+                    <option value="avgTimePerMonthLastYear">Past 12 months</option>
+                  </select>
                 </div>
-                <div className='max-h-[30rem] w-full xl:w-96 bg-white rounded-xl drop-shadow-lg p-4 flex flex-col '>
+              </div>
+              <div className='flex-1 flex items-center justify-center'>
+                {avgTimeSpentPeriod && avgTimeSpentPeriod[selectedRange] && (
+                  <div className='w-full h-[40rem] flex items-center justify-center'> {/* This div will help the chart fill the remaining space */}
+                    <LineChart 
+                      data={avgTimeSpentPeriod[selectedRange]} 
+                      timeUnit={timeUnit} 
+                      tooltipTitle={tooltipTitle} 
+                      displayXscale={displayXscale}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+
+                {/* <div className=' w-full xl:w-96 bg-white rounded-xl drop-shadow-lg p-4 flex flex-col '>
                     <div className='flex justify-between'>
                       <span className='font-semibold text-2xl '>Top Trending Courses</span>
                       <select className='p-1 cursor-pointer' onChange={(e) => putLimit(Number(e.target.value))}>
@@ -170,8 +164,8 @@ const EmployeeDashboard = () => {
                         )})
                       }
                     </div>
-                </div>
-            </div>
+                </div> */}
+            {/* </div> */}
         </div>
   )
 }

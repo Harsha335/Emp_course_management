@@ -421,7 +421,7 @@ export const avgTimeSpentForPeriods = async (req: CustomRequest, res: Response) 
     
     // 1. Get average time spent for the last 30 days
     const thirtyDaysAgo = new Date(currentDate);
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30 +1);
     
     const avgTimePerDayLast30Days = await prisma.courseEngageLogs.groupBy({
       by: ['start_time'],
@@ -540,7 +540,7 @@ export const avgTimeSpentForPeriods = async (req: CustomRequest, res: Response) 
 export const topTrendingCoures = async (req: CustomRequest, res: Response) => {
   try{
     const limit = req.query.limit ? Number(req.query.limit) : 5;
-    console.log(limit)
+    // console.log(limit)
     const courses = await prisma.courseEnrollment.groupBy({
       by: ['course_id'], // Group by course_id
       where: {
@@ -587,3 +587,133 @@ export const topTrendingCoures = async (req: CustomRequest, res: Response) => {
     res.status(500).json({ error: 'Error fetching top trending courses' });
   }
 }
+
+
+export const empAvgTimeSpentForPeriods = async (req: CustomRequest, res: Response) => {
+  try {
+    const emp_id = req.user?.user_id; // Get the employee ID from the request
+    if (!emp_id) {
+      return res.status(400).json({ error: 'Employee ID is required' });
+    }
+    
+    const currentDate = new Date();
+
+    // 1. Get average time spent for the last 30 days
+    const thirtyDaysAgo = new Date(currentDate);
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30 + 1);
+    
+    const avgTimePerDayLast30Days = await prisma.courseEngageLogs.groupBy({
+      by: ['start_time'],
+      where: {
+        start_time: {
+          gte: thirtyDaysAgo,
+          // lte: currentDate,
+        },
+        CourseEnrollment: {
+          emp_id, // Filter by emp_id
+        },
+      },
+      _avg: {
+        time_spent_in_sec: true,
+      },
+    });
+
+    // 2. Format and fill missing dates for the last 30 days
+    const formattedAvgTimePerDay = Array.from({ length: 30 }, (_, i) => {
+      const date = new Date(thirtyDaysAgo);
+      date.setDate(date.getDate() + i);
+      const dateString = date.toISOString().split('T')[0];
+      
+      const avgEntry = avgTimePerDayLast30Days.find(entry => 
+        entry.start_time.toISOString().split('T')[0] === dateString
+      );
+
+      return {
+        date: dateString,
+        avgTimeSpent: avgEntry ? Number(avgEntry._avg.time_spent_in_sec) : 0,
+      };
+    });
+
+    // 3. Get average time spent for the last 6 months
+    interface AvgTimeLog {
+      month: Date; // This will hold the Date object for month
+      avg_time_spent: number; // This will hold the average time spent
+    }
+
+    const sixMonthsAgo = new Date(currentDate);
+    sixMonthsAgo.setMonth(currentDate.getMonth() - 6 + 1);
+    
+    const avgTimePerMonthLast6Months = await prisma.$queryRaw<AvgTimeLog[]>`
+      SELECT DATE_TRUNC('month', "start_time") AS month, 
+             AVG(time_spent_in_sec) AS avg_time_spent
+      FROM "CourseEngageLogs" 
+      JOIN "CourseEnrollment" ON "CourseEnrollment"."enroll_id" = "CourseEngageLogs"."enroll_id"
+      WHERE "start_time" >= ${sixMonthsAgo}
+      AND "CourseEnrollment"."emp_id" = ${emp_id}
+      GROUP BY month
+      ORDER BY month;
+    `;
+
+    // 4. Format and fill missing months for the last 6 months
+    const formattedAvgTimePerMonthLast6Months = Array.from({ length: 6 }, (_, i) => {
+      const month = new Date(sixMonthsAgo);
+      month.setMonth(month.getMonth() + i);
+      month.setDate(1); // Set the date to the first of the month
+
+      const monthString = month.toISOString().split('T')[0]; // Format as YYYY-MM-01
+      
+      const avgEntry = avgTimePerMonthLast6Months.find(entry =>
+        entry.month.toISOString().substring(0, 10) === monthString
+      );
+
+      return {
+        date: monthString,
+        avgTimeSpent: avgEntry ? Number(avgEntry.avg_time_spent) : 0,
+      };
+    });
+
+    // 5. Get average time spent for the last year
+    const oneYearAgo = new Date(currentDate);
+    oneYearAgo.setMonth(currentDate.getMonth() - 12 + 1);
+    
+    const avgTimePerMonthLastYear = await prisma.$queryRaw<AvgTimeLog[]>`
+      SELECT DATE_TRUNC('month', "start_time") AS month, 
+             AVG(time_spent_in_sec) AS avg_time_spent
+      FROM "CourseEngageLogs"
+      JOIN "CourseEnrollment" ON "CourseEnrollment"."enroll_id" = "CourseEngageLogs"."enroll_id"
+      WHERE "start_time" >= ${oneYearAgo} 
+      AND "CourseEnrollment"."emp_id" = ${emp_id}
+      GROUP BY month
+      ORDER BY month;
+    `;
+
+    // 6. Format and fill missing months for the last year
+    const formattedAvgTimePerMonthLastYear = Array.from({ length: 12 }, (_, i) => {
+      const month = new Date(oneYearAgo);
+      month.setMonth(month.getMonth() + i);
+      month.setDate(1); // Set the date to the first of the month
+
+      const monthString = month.toISOString().split('T')[0]; // Format as YYYY-MM-01
+      
+      const avgEntry = avgTimePerMonthLastYear.find(entry =>
+        entry.month.toISOString().substring(0, 10) === monthString
+      );
+
+      return {
+        date: monthString,
+        avgTimeSpent: avgEntry ? Number(avgEntry.avg_time_spent) : 0,
+      };
+    });
+
+    // Respond with the formatted data
+    res.status(200).json({
+      avgTimePerDayLast30Days: formattedAvgTimePerDay,
+      avgTimePerMonthLast6Months: formattedAvgTimePerMonthLast6Months,
+      avgTimePerMonthLastYear: formattedAvgTimePerMonthLastYear,
+    });
+    
+  } catch (error) {
+    console.error("Error fetching average time spent for employee:", error);
+    res.status(500).json({ error: 'Error fetching average time spent' });
+  }
+};

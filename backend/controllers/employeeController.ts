@@ -64,6 +64,25 @@ export const getEmployeeStatistics = async (req: CustomRequest, res: Response) =
       },
     });
 
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    // Fetch employee statistics
+    const prevStatistics = await prisma.courseEnrollment.aggregate({
+      _count: {
+        course_id: true, // Total courses assigned
+        course_certificate_url: true, // Total certificates (non-null)
+      },
+      _avg: {
+        test_score: true, // Average test score
+      },
+      where: {
+        emp_id: emp_id, // Filter by employee ID
+        createdAt: {
+          lte: oneMonthAgo
+        }
+      },
+    });
+
     // Fetch average time spent
     const timeSpent = await prisma.courseEngageLogs.aggregate({
       _avg: {
@@ -75,13 +94,26 @@ export const getEmployeeStatistics = async (req: CustomRequest, res: Response) =
         },
       },
     });
+    const prevTimeSpent = await prisma.courseEngageLogs.aggregate({
+      _avg: {
+        time_spent_in_sec: true, // Average time spent
+      },
+      where: {
+        CourseEnrollment: {
+          emp_id: emp_id, // Filter by employee ID
+        },
+        start_time:{
+          lte: oneMonthAgo
+        }
+      },
+    });
 
     // Combine the results
     const result = {
-      totalCoursesAssigned: statistics._count.course_id,
-      totalCertificates: statistics._count.course_certificate_url,
-      avgTestScore: statistics._avg.test_score || null, // Handle case where avg is null
-      avgTimeSpent: timeSpent._avg.time_spent_in_sec || null, // Handle case where avg is null
+      totalCoursesAssigned: {curr: statistics._count.course_id, prev: prevStatistics._count.course_id},
+      totalCertificates: {curr: statistics._count.course_certificate_url, prev: prevStatistics._count.course_certificate_url},
+      avgTestScore: {curr: statistics._avg.test_score || null, prev: prevStatistics._avg.test_score || null}, // Handle case where avg is null
+      avgTimeSpent: {curr: timeSpent._avg.time_spent_in_sec || null, prev: prevTimeSpent._avg.time_spent_in_sec || null} // Handle case where avg is null
     };
 
     // Return the response
