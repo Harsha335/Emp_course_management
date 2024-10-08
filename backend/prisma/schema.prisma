@@ -39,8 +39,10 @@ model Course {
   CourseEnrollment CourseEnrollment[]
   QuestionBank    QuestionBank? // Made optional
   LearningPathMap  LearningPathMap[] // Many-to-many relationship
+  createdAt       DateTime @default(now())
 
   @@unique([course_name, difficulty_level])
+
 }
 
 // Enum for difficulty level
@@ -79,6 +81,7 @@ model CourseEnrollment {
   total_pages                   Int?
   test_score                   Float?
   course_certificate_url       String? // Optional certificate URL
+  createdAt                    DateTime @default(now())
 
   // Relationships
   employee           Employee             @relation(fields: [emp_id], references: [emp_id], onDelete: Cascade)
@@ -140,9 +143,11 @@ model User {
   user_id  String @id @unique // Primary Key
   password String
   role     Role   @default(EMPLOYEE) // Default role is EMPLOYEE // Enum
+  createdAt       DateTime @default(now())
 
   // Relationship to Employee (one-to-many)
   Employee Employee[]
+
 }
 
 // Enum for employee designation

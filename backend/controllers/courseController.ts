@@ -3,6 +3,7 @@ import prisma from '../utils/prisma';
 import cloudinary from '../utils/cloudinary';
 import axios from 'axios';
 import { JwtPayloadType } from '../utils/jwtHelper';
+import { Prisma } from '@prisma/client';
 const { Dropbox } = require('dropbox');
 require('dotenv').config();
 
@@ -309,5 +310,280 @@ export const getCourseLearningPaths = async (req: CustomRequest, res: Response) 
   }catch(err) {
     console.log("Error @ getCourseLearningPaths: ", err);
     res.status(500).json({messsage: 'Error at featching learning_path'});
+  }
+}
+
+export const coursesCountIncrease = async (req: CustomRequest, res: Response) => {
+  try{
+    const courses = await prisma.course.findMany({
+    });
+    // console.log(courses, courses.length);
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+    const prevCourses = await prisma.course.findMany({
+      where: {
+        createdAt: {
+          lte: oneMonthAgo, // Compare with a Date object
+        },
+      },
+    });
+    // console.log(prevcourses, prevcourses.length);
+    const courseCount = courses.length;
+    const courseDeltaPer = ((courses.length - prevCourses.length)/courses.length)*100;
+    res.status(200).json({courseCount, courseDeltaPer});
+
+  }catch(error) {
+    console.log("Error at dashboard empCount: ", error);
+    res.status(500).json({error: 'Error fetching employee count'})
+  }
+}
+
+export const avgTimeSpentIncrease = async (req: CustomRequest, res: Response) => {
+  try {
+    // Get the current date and the date from one month ago
+    const currentDate = new Date();
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+    // Fetch total time spent by all employees (current)
+    const currentLogs = await prisma.courseEngageLogs.findMany({
+      select: {
+        time_spent_in_sec: true
+      }
+    });
+
+    // Fetch total time spent by all employees (1 month back)
+    const prevLogs = await prisma.courseEngageLogs.findMany({
+      where: {
+        start_time: {
+          lte: oneMonthAgo, // Get records starting from one month ago to now
+        }
+      },
+      select: {
+        time_spent_in_sec: true
+      }
+    });
+
+    // Calculate average time spent (current)
+    const currentTotalTime = currentLogs.reduce((acc, log) => acc + log.time_spent_in_sec, 0);
+    const currentAvgTime = currentLogs.length > 0 ? currentTotalTime / currentLogs.length : 0;
+
+    // Calculate average time spent (1 month back)
+    const prevTotalTime = prevLogs.reduce((acc, log) => acc + log.time_spent_in_sec, 0);
+    const prevAvgTime = prevLogs.length > 0 ? prevTotalTime / prevLogs.length : 0;
+
+    // console.log(currentAvgTime, currentTotalTime)
+    // console.log(prevAvgTime, prevTotalTime)
+      const avgTimeSpentDeltaPer = ((currentAvgTime - prevAvgTime)/currentAvgTime)*100;
+    // Send response with both averages
+    res.status(200).json({
+      avgTimeSpent: currentAvgTime,
+      avgTimeSpentDeltaPer
+    });
+
+  } catch (error) {
+    console.error("Error at dashboard avgTimeSpentIncrease: ", error);
+    res.status(500).json({ error: 'Error fetching avg time spent increase' });
+  }
+};
+
+
+export const courseEnrollmentIncrease = async (req: CustomRequest, res: Response) => {
+  try{
+    const courseEnrollments = await prisma.courseEnrollment.findMany({
+    });
+    // console.log(courses, courses.length);
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+    const prevCourseEnrollments = await prisma.courseEnrollment.findMany({
+      where: {
+        createdAt: {
+          lte: oneMonthAgo, // Compare with a Date object
+        },
+      },
+    });
+    // console.log(prevcourses, prevcourses.length);
+    const courseEnrollmentCount = courseEnrollments.length;
+    const courseEnrollmentDeltaPer = ((courseEnrollments.length - prevCourseEnrollments.length)/courseEnrollments.length)*100;
+    res.status(200).json({courseEnrollmentCount, courseEnrollmentDeltaPer});
+
+  }catch(error) {
+    console.log("Error at dashboard courseEnrollmentIncrease: ", error);
+    res.status(500).json({error: 'Error fetching courseEnrollment Increase'})
+  }
+}
+
+export const avgTimeSpentForPeriods = async (req: CustomRequest, res: Response) => {
+  try {
+    const currentDate = new Date();
+    
+    // 1. Get average time spent for the last 30 days
+    const thirtyDaysAgo = new Date(currentDate);
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const avgTimePerDayLast30Days = await prisma.courseEngageLogs.groupBy({
+      by: ['start_time'],
+      where: {
+        start_time: {
+          gte: thirtyDaysAgo,
+          lte: currentDate,
+        },
+      },
+      _avg: {
+        time_spent_in_sec: true,
+      },
+    });
+
+    // 2. Format and fill missing dates for the last 30 days
+    const formattedAvgTimePerDay = Array.from({ length: 30 }, (_, i) => {
+      const date = new Date(thirtyDaysAgo);
+      date.setDate(date.getDate() + i);
+      const dateString = date.toISOString().split('T')[0];
+      
+      const avgEntry = avgTimePerDayLast30Days.find(entry => 
+        entry.start_time.toISOString().split('T')[0] === dateString
+      );
+
+      return {
+        date: dateString,
+        avgTimeSpent: avgEntry ? Number(avgEntry._avg.time_spent_in_sec) : 0,
+      };
+    });
+
+    // 3. Get average time spent for the last 6 months
+
+    interface AvgTimeLog {
+      month: Date; // This will hold the Date object for month
+      avg_time_spent: number; // This will hold the average time spent
+    }
+
+    const sixMonthsAgo = new Date(currentDate);
+    sixMonthsAgo.setMonth(currentDate.getMonth() - 6 + 1);
+    
+    const avgTimePerMonthLast6Months = await prisma.$queryRaw<AvgTimeLog[]>`
+      SELECT DATE_TRUNC('month', "start_time") AS month, 
+             AVG(time_spent_in_sec) AS avg_time_spent
+      FROM "CourseEngageLogs"
+      WHERE "start_time" >= ${sixMonthsAgo} AND "start_time" <= ${currentDate}
+      GROUP BY month
+      ORDER BY month;
+    `;
+
+    // 4. Format and fill missing months for the last 6 months
+    const formattedAvgTimePerMonthLast6Months = Array.from({ length: 6 }, (_, i) => {
+      const month = new Date(sixMonthsAgo);
+      month.setMonth(month.getMonth() + i);
+      month.setDate(1); // Set the date to the first of the month
+
+      const monthString = month.toISOString().split('T')[0]; // Format as YYYY-MM-01
+      
+      const avgEntry = avgTimePerMonthLast6Months.find(entry =>
+        entry.month.toISOString().substring(0, 10) === monthString
+      );
+
+      return {
+        date: monthString,
+        avgTimeSpent: avgEntry ? Number(avgEntry.avg_time_spent) : 0,
+      };
+    });
+
+    // 5. Get average time spent for the last year
+    const oneYearAgo = new Date(currentDate);
+    oneYearAgo.setMonth(currentDate.getMonth() - 12 + 1);
+    
+    const avgTimePerMonthLastYear = await prisma.$queryRaw<AvgTimeLog[]>`
+      SELECT DATE_TRUNC('month', "start_time") AS month, 
+             AVG(time_spent_in_sec) AS avg_time_spent
+      FROM "CourseEngageLogs"
+      WHERE "start_time" >= ${oneYearAgo} AND "start_time" <= ${currentDate}
+      GROUP BY month
+      ORDER BY month;
+    `;
+
+    // 6. Format and fill missing months for the last year
+    const formattedAvgTimePerMonthLastYear = Array.from({ length: 12 }, (_, i) => {
+      const month = new Date(oneYearAgo);
+      month.setMonth(month.getMonth() + i);
+      month.setDate(1); // Set the date to the first of the month
+
+      const monthString = month.toISOString().split('T')[0]; // Format as YYYY-MM-01
+      
+      const avgEntry = avgTimePerMonthLast6Months.find(entry =>
+        entry.month.toISOString().substring(0, 10) === monthString
+      );
+
+      return {
+        date: monthString,
+        avgTimeSpent: avgEntry ? Number(avgEntry.avg_time_spent) : 0,
+      };
+    });
+    // console.log({
+    //   avgTimePerDayLast30Days: formattedAvgTimePerDay,
+    //   avgTimePerMonthLast6Months: formattedAvgTimePerMonthLast6Months,
+    //   avgTimePerMonthLastYear: formattedAvgTimePerMonthLastYear,
+    // })
+    // Respond with the formatted data
+    res.status(200).json({
+      avgTimePerDayLast30Days: formattedAvgTimePerDay,
+      avgTimePerMonthLast6Months: formattedAvgTimePerMonthLast6Months,
+      avgTimePerMonthLastYear: formattedAvgTimePerMonthLastYear,
+    });
+    
+  } catch (error) {
+    console.error("Error fetching average time spent:", error);
+    res.status(500).json({ error: 'Error fetching average time spent' });
+  }
+};
+
+export const topTrendingCoures = async (req: CustomRequest, res: Response) => {
+  try{
+    const limit = req.query.limit ? Number(req.query.limit) : 5;
+    console.log(limit)
+    const courses = await prisma.courseEnrollment.groupBy({
+      by: ['course_id'], // Group by course_id
+      where: {
+        course_certificate_url: {
+          not: null, // Only consider records with a non-null course_certificate_url
+        },
+      },
+      _count: {
+        course_certificate_url: true, // Count of certificates
+      },
+      orderBy: {
+        _count: {
+          course_certificate_url: 'desc', // Order by count in descending order
+        },
+      },
+      take: limit, // Get top 5 courses
+    });
+    // Fetch course details for the top trending courses
+    const courseDetails = await Promise.all(
+      courses.map(async (course) => {
+        const courseInfo = await prisma.course.findUnique({
+          where: { course_id: course.course_id },
+          select: {
+            course_id: true,
+            course_img_url: true,
+            course_name: true, // Adjust according to your model's structure
+            difficulty_level: true
+          },
+        });
+
+        return {
+          id: courseInfo?.course_id,
+          img_url: courseInfo?.course_img_url,
+          name: courseInfo?.course_name+' ('+courseInfo?.difficulty_level+')',
+          certificates_count: course._count.course_certificate_url, // Certification count
+        };
+      })
+    );
+
+    // Return the response
+    res.status(200).json(courseDetails);
+  }catch(err){
+    console.error("Error fetching topTrendingCoures:", err);
+    res.status(500).json({ error: 'Error fetching top trending courses' });
   }
 }

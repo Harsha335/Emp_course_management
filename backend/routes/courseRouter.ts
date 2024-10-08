@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addCourse, allCourses, courseEmployeeRelation, courseEmployeeRelationUpdate, getPDF, assignedCoursesDetails, updateAssignedCourse, getAllLearningPaths, addLearningPath, getCourseLearningPaths } from "../controllers/courseController";
+import { addCourse, allCourses, courseEmployeeRelation, courseEmployeeRelationUpdate, getPDF, assignedCoursesDetails, updateAssignedCourse, getAllLearningPaths, addLearningPath, getCourseLearningPaths, coursesCountIncrease, avgTimeSpentIncrease, courseEnrollmentIncrease, avgTimeSpentForPeriods, topTrendingCoures } from "../controllers/courseController";
 import { verifyAdmin, verifyUser } from "../middleware/verifyUser";
 // Multer configuration
 import multer from 'multer';
@@ -21,5 +21,11 @@ router.post('/updateAssignedCourse', verifyUser, updateAssignedCourse);
 router.get('/learningPaths', verifyAdmin, getAllLearningPaths);
 router.post('/learningPaths/add', verifyAdmin, addLearningPath);
 router.post('/courseLearningPaths', verifyUser, getCourseLearningPaths);
+
+router.get('/coursesCountIncrease', verifyAdmin, coursesCountIncrease);
+router.get('/avgTimeSpentIncrease', verifyAdmin, avgTimeSpentIncrease);
+router.get('/courseEnrollmentIncrease', verifyAdmin, courseEnrollmentIncrease);
+router.get('/avgTimeSpentForPeriods', verifyAdmin, avgTimeSpentForPeriods);
+router.get('/topTrendingCoures', verifyAdmin, topTrendingCoures);
 
 export default router;
