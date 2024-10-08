@@ -1,110 +1,99 @@
-import { PrismaClient } from '@prisma/client';
-import { faker } from '@faker-js/faker';
 import bcrypt from 'bcrypt';
+import { PrismaClient } from '@prisma/client';
+import { faker } from '@faker-js/faker'; // Assuming you're using Faker.js v8 or newer
 
 const prisma = new PrismaClient();
 
-async function main() {
-    enum Role {
-        ADMIN,
-        EMPLOYEE
-      }
-      // Enum for employee designation
+enum Role {
+  ADMIN = 'ADMIN',
+  EMPLOYEE = 'EMPLOYEE',
+}
+
 enum Designation {
-    SOFTWARE_ENGINEER,
-    SR_SOFTWARE_ENGINEER,
-    SOLUTION_ENABLER,
-    SOLUTION_CONSULTANT,
-    TECHNOLOGY_SOLUTION_ARCHITECT,
-    PRINCIPAL_SOLUTION_ARCHITECT
-  }
-  // Create multiple users
-  const userRoles = ['EMPLOYEE', 'ADMIN']; // Predefined roles
+  SOFTWARE_ENGINEER = 'SOFTWARE_ENGINEER',
+  SR_SOFTWARE_ENGINEER = 'SR_SOFTWARE_ENGINEER',
+  SOLUTION_ENABLER = 'SOLUTION_ENABLER',
+  SOLUTION_CONSULTANT = 'SOLUTION_CONSULTANT',
+  TECHNOLOGY_SOLUTION_ARCHITECT = 'TECHNOLOGY_SOLUTION_ARCHITECT',
+  PRINCIPAL_SOLUTION_ARCHITECT = 'PRINCIPAL_SOLUTION_ARCHITECT',
+}
+
+async function main() {
+  // Predefined roles and designations for alternating assignments
+  const userRoles: Role[] = [Role.EMPLOYEE, Role.ADMIN];
+  const designations: Designation[] = [
+    Designation.SOFTWARE_ENGINEER,
+    Designation.SR_SOFTWARE_ENGINEER,
+    Designation.SOLUTION_ENABLER,
+    Designation.SOLUTION_CONSULTANT,
+    Designation.TECHNOLOGY_SOLUTION_ARCHITECT,
+    Designation.PRINCIPAL_SOLUTION_ARCHITECT,
+  ];
+
   for (let i = 100; i <= 199; i++) {
-    const hashedPassword = await bcrypt.hash(`JMD${i}`, 10);
+    const hashedPassword = await bcrypt.hash(`JMD${i}`, 10); // Hash password with bcrypt
+    const randomDesignation = designations[i % designations.length]; // Assign random designation
+
+    // Create user in the User model
     await prisma.user.create({
       data: {
         user_id: `JMD${i}`,
-        password: hashedPassword, //faker.internet.password(),    // password JMD${i}
-        role: userRoles[i % 2], // Assign alternating roles (EMPLOYEE, ADMIN)
-        createdAt: faker.date.past(),
+        password: hashedPassword, // Use bcrypt-hashed password
+        role: Role.EMPLOYEE,
+        createdAt: faker.date.past(), // Faker for random past date
       },
     });
+
+    // Create corresponding employee in Employee model
     await prisma.employee.create({
       data: {
-        emp_id: `JMD${i}`, // Links to user with the same id
-        email: `JMD${i}@jmangroup.com`,
-        emp_name: faker.person.fullName(),
-        designation: i % 2 === 0 ? 'SOFTWARE_ENGINEER' : 'SR_SOFTWARE_ENGINEER', // Alternate designations
+        emp_id: `JMD${i}`, // Reference the same ID as in User model
+        email: `JMD${i}@jmangroup.com`, // Fake email using the JMD id
+        emp_name: faker.person.fullName(), // Faker for random full names
+        designation: randomDesignation, // Assign a random designation
       },
     });
   }
 
-  // Create multiple courses
-  for (let i = 1; i <= 5; i++) {
-    await prisma.course.create({
-      data: {
-        course_name: `Course ${i}`,
-        description: `Description for Course ${i}`,
-        duration: `${i} months`, // Dynamic duration
-        difficulty_level: i % 4 === 0 ? 'EXPERT' : 'BEGINNER', // Alternate between beginner and expert
-        course_img_url: faker.image.url(),
-        course_file_url: faker.internet.url(),
-        createdAt: faker.date.past(),
-      },
-    });
-  }
+  console.log('Users and employees created successfully!');
 
-  // Create multiple course enrollments
-  for (let i = 1; i <= 8; i++) {
-    await prisma.courseEnrollment.create({
-      data: {
-        emp_id: `JMD${i}`, // Link to employee
-        course_id: (i % 5) + 1, // Enroll to different courses
-        current_page: Math.floor(Math.random() * 50) + 1, // Random page between 1 and 50
-        total_pages: 100,
-        test_score: Math.floor(Math.random() * 100) + 1, // Random score between 1 and 100
-        createdAt: faker.date.recent(),
-        course_certificate_url: faker.internet.url(),   // some be null
-      },
-    });
-  }
+    // Create multiple learning paths
+  // for (let i = 1; i <= 3; i++) {
+  //   await prisma.learningPath.create({
+  //     data: {
+  //       path_name: `Learning Path ${i}`,
+  //       description: `Description for Learning Path ${i}`,
+  //     },
+  //   });
+  // }
 
-  // Create multiple learning paths
-  for (let i = 1; i <= 3; i++) {
-    await prisma.learningPath.create({
-      data: {
-        path_name: `Learning Path ${i}`,
-        description: `Description for Learning Path ${i}`,
-      },
-    });
-  }
-// Meaningful learning paths
+  // Meaningful learning paths
 const learningPaths = [
-    { path_name: "Software Engineering", description: "Master the fundamentals of software development" },
-    { path_name: "Cloud Computing", description: "Learn about scalable cloud solutions" },
-    { path_name: "Data Science", description: "Analyze data and build machine learning models" },
-    { path_name: "Cybersecurity", description: "Protect systems and data from security threats" },
-    { path_name: "Web Development", description: "Build websites and web applications" },
-    { path_name: "Mobile Development", description: "Create mobile applications for Android and iOS" },
-    { path_name: "DevOps", description: "Learn about automating deployment and managing infrastructure" },
-    { path_name: "AI and Machine Learning", description: "Develop intelligent systems using AI/ML" },
-    { path_name: "Blockchain", description: "Understand decentralized systems and blockchain technologies" },
-    { path_name: "Internet of Things (IoT)", description: "Connect and control devices with IoT solutions" },
-    { path_name: "Project Management", description: "Learn techniques to manage projects efficiently" },
-    { path_name: "Agile Methodologies", description: "Master Agile frameworks and tools" },
-    { path_name: "Quality Assurance", description: "Ensure software quality through testing" },
-    { path_name: "Big Data", description: "Handle and analyze large datasets" },
-    { path_name: "Software Architecture", description: "Design scalable and maintainable software systems" },
-  ];
-  
+  { path_name: "Software Engineering", description: "Master the fundamentals of software development" },
+  { path_name: "Cloud Computing", description: "Learn about scalable cloud solutions" },
+  { path_name: "Data Science", description: "Analyze data and build machine learning models" },
+  { path_name: "Cybersecurity", description: "Protect systems and data from security threats" },
+  { path_name: "Web Development", description: "Build websites and web applications" },
+  { path_name: "Mobile Development", description: "Create mobile applications for Android and iOS" },
+  { path_name: "DevOps", description: "Learn about automating deployment and managing infrastructure" },
+  { path_name: "AI and Machine Learning", description: "Develop intelligent systems using AI/ML" },
+  { path_name: "Blockchain", description: "Understand decentralized systems and blockchain technologies" },
+  { path_name: "Internet of Things (IoT)", description: "Connect and control devices with IoT solutions" },
+  { path_name: "Project Management", description: "Learn techniques to manage projects efficiently" },
+  { path_name: "Agile Methodologies", description: "Master Agile frameworks and tools" },
+  { path_name: "Quality Assurance", description: "Ensure software quality through testing" },
+  { path_name: "Big Data", description: "Handle and analyze large datasets" },
+  { path_name: "Software Architecture", description: "Design scalable and maintainable software systems" },
+];
+
 
 // Insert learning paths into the database
 for (const learningPath of learningPaths) {
-    await prisma.learningPath.create({
-      data: learningPath,
-    });
-  }
+  await prisma.learningPath.create({
+    data: learningPath,
+  });
+}
+
   
   // Meaningful courses
   const courses = [
@@ -135,6 +124,47 @@ for (const learningPath of learningPaths) {
       },
     });
   }
+
+  // Enum for difficulty level
+// enum DifficultyLevel {
+//   BASIC,
+//   BEGINNER,
+//   INTERMEDIATE,
+//   EXPERT
+// }
+//   // Create multiple courses
+//   for (let i = 1; i <= 5; i++) {
+//     await prisma.course.create({
+//       data: {
+//         course_name: `Course ${i}`,
+//         description: `Description for Course ${i}`,
+//         duration: `${i} months`, // Dynamic duration
+//         difficulty_level: i % 4 === 0 ? 'EXPERT' : 'BEGINNER', // Alternate between beginner and expert
+//         course_img_url: faker.image.url(),
+//         course_file_url: faker.internet.url(),
+//         createdAt: faker.date.past(),
+//       },
+//     });
+//   }
+
+  // Create multiple course enrollments
+  for (let i = 100; i <= 199; i++) {
+    await prisma.courseEnrollment.create({
+      data: {
+        emp_id: `JMD${i}`, // Link to employee
+        course_id: 100 + Math.floor(Math.random() * courses.length), // Enroll to different courses
+        current_page: Math.floor(Math.random() * 100) + 1, // Random page between 1 and 50
+        total_pages: 100,
+        test_score: Math.floor(Math.random() * 100) + 1, // Random score between 1 and 100
+        createdAt: faker.date.recent(),
+        course_certificate_url: faker.internet.url(),   // some be null
+      },
+    });
+  }
+
+
+
+
   
   // Assign courses to learning paths
   const courseIds = await prisma.course.findMany({ select: { course_id: true } });
