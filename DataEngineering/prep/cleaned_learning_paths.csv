@@ -1,0 +1,20 @@
+learning_path_id,learning_path_description,learning_path_name
+1,"A machine learning (ML) learning path is a structured curriculum designed to guide learners through the various stages of mastering machine learning concepts and techniques. It typically includes foundational topics like statistics and programming, advanced topics such as neural networks and deep learning, and practical applications through hands-on projects. Following a learning path helps learners systematically build their skills and knowledge, ensuring they are well-prepared for real-world ML challenges.",Machine Learning
+2,"An Artificial Intelligence (AI) learning path is a comprehensive roadmap that outlines the essential concepts and skills needed to understand and implement AI technologies. It usually starts with foundational topics like programming, data analysis, and machine learning, progressing to advanced subjects such as natural language processing, computer vision, and reinforcement learning. By following this structured path, learners can effectively develop the expertise required to create intelligent systems and applications in various domains.",Artificial Intelligence
+3,"The Full Stack Learning Path equips learners with the skills necessary to develop complete web applications from front to back. This comprehensive path covers essential technologies, including HTML, CSS, and JavaScript for front-end development, as well as server-side programming languages like Node.js and frameworks such as Express. Additionally, learners will explore database management with SQL and NoSQL databases, API development, and version control with Git. By the end of this path, participants will be proficient in building, deploying, and maintaining full-fledged applications, preparing them for diverse roles in web development.",Full Stack
+4,"The Frontend Learning Path focuses on the design and implementation of user interfaces for web applications. It covers core technologies such as HTML, CSS, and JavaScript, enabling learners to create responsive and interactive web pages. This path also delves into modern frameworks and libraries like React, Angular, or Vue.js, emphasizing component-based architecture and state management. Learners will gain a deep understanding of user experience (UX) design principles, accessibility standards, and performance optimization techniques. By the end of this learning path, participants will be equipped to build dynamic and visually appealing web applications that enhance user engagement.",Frontend
+100,Master the fundamentals of software development,Software Engineering
+101,Learn about scalable cloud solutions,Cloud Computing
+102,Analyze data and build machine learning models,Data Science
+103,Protect systems and data from security threats,Cybersecurity
+104,Build websites and web applications,Web Development
+105,Create mobile applications for Android and iOS,Mobile Development
+106,Learn about automating deployment and managing infrastructure,DevOps
+107,Develop intelligent systems using AI/ML,AI and Machine Learning
+108,Understand decentralized systems and blockchain technologies,Blockchain
+109,Connect and control devices with IoT solutions,Internet of Things (IoT)
+110,Learn techniques to manage projects efficiently,Project Management
+111,Master Agile frameworks and tools,Agile Methodologies
+112,Ensure software quality through testing,Quality Assurance
+113,Handle and analyze large datasets,Big Data
+114,Design scalable and maintainable software systems,Software Architecture
