@@ -717,3 +717,73 @@ export const empAvgTimeSpentForPeriods = async (req: CustomRequest, res: Respons
     res.status(500).json({ error: 'Error fetching average time spent' });
   }
 };
+
+export const getPredictedLearningPath = async (req: CustomRequest, res: Response) => {
+  try {
+    const emp_id = req.user?.user_id || 'JMD001';
+
+    // Fetching course enrollment details for the employee
+    const courseEnrollmentData = await prisma.courseEnrollment.findMany({
+      where: { emp_id },
+      include: {
+        CourseEngageLogs: true,
+        Notifications: true,
+        course: {
+          select: {
+            LearningPathMap: {
+              select: {
+                learning_path_id: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // Clean and process the enrollment data
+    const cleaned_course_enrollment_data = courseEnrollmentData.map(enrollment => {
+      const { current_page, total_pages, test_score, CourseEngageLogs, Notifications } = enrollment;
+
+      // Normalize the completion rate based on current_page / total_pages
+      const completion_rate = total_pages ? (current_page || 0) / total_pages : 0;
+
+      // Normalize the test score assuming the max score is 100
+      const test_score_normalized = test_score ? test_score / 100 : 0;
+
+      // Total time spent on the course
+      const total_time_spent_in_sec = CourseEngageLogs.reduce((total, log) => total + log.time_spent_in_sec, 0);
+
+      // Calculate success rate based on notifications
+      const { total_attempts, accepted_attempts } = Notifications.reduce((acc, notification) => {
+        const { status } = notification;
+        acc.total_attempts += 1;
+        if (status) acc.accepted_attempts += 1;
+        return acc;
+      }, { total_attempts: 0, accepted_attempts: 0 });
+
+      const success_rate = accepted_attempts / total_attempts;
+
+      // Get the learning path ID from the course
+      const learning_path_ids = enrollment.course.LearningPathMap.map(path => path.learning_path_id) || null;
+
+      return {
+        emp_id: enrollment.emp_id,
+        learning_path_ids,
+        completion_rate,
+        test_score_normalized,
+        total_time_spent_in_sec,
+        success_rate
+      };
+    });
+
+    // Send the cleaned data to Flask API for prediction
+    const response = await axios.post(`${process.env.FLASK_SERVER}/predict`, cleaned_course_enrollment_data);
+    console.log("RESPONSE: ",response);
+    // Send prediction result back to the client
+    res.status(200).json(response.data);
+
+  } catch (error) {
+    console.error("Error fetching PredictedLearningPath for employee:", error);
+    res.status(500).json({ error: 'Error fetching PredictedLearningPath' });
+  }
+};

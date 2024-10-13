@@ -1,14 +1,9 @@
 import bcrypt from 'bcrypt';
-import prisma from '../utils/prisma';
+import prisma from '../../utils/prisma';
 import { faker } from '@faker-js/faker';
 import fs from 'fs';
 import path from 'path';
 import csvParser from 'csv-parser';
-import { fileURLToPath } from 'url'; // Import for ES module __dirname
-
-// Equivalent of __dirname in ES module
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 enum Role {
   ADMIN = 'ADMIN',
@@ -53,7 +48,7 @@ async function main() {
   });
   await prisma.notifications.deleteMany({
     where:{
-      enroll_id: {gte: 100}
+      notification_id: {gte: 100}
     }
   });
   await prisma.courseEnrollment.deleteMany({
@@ -117,9 +112,9 @@ async function main() {
 
 
   // Read and insert data from CSVs
-  const courses = await readCSV(path.join(__dirname, './uploads_fakeData/courses.csv'));
-  const learningPaths = await readCSV(path.join(__dirname, './uploads_fakeData/learning_paths.csv'));
-  const learningPathMap = await readCSV(path.join(__dirname, './uploads_fakeData/learning_path_map.csv'));
+  const courses = await readCSV(path.join(__dirname, '../uploads_fakeData/courses.csv'));
+  const learningPaths = await readCSV(path.join(__dirname, '../uploads_fakeData/learning_paths.csv'));
+  const learningPathMap = await readCSV(path.join(__dirname, '../uploads_fakeData/learning_path_map.csv'));
 
   // Insert courses into the database
   for (const course of courses) {
@@ -209,6 +204,7 @@ async function main() {
     }
   }
 
+  let notification_id: number = 100;
   // Logic for Notifications
   for (const enrollment of enrollments) {
     const hasCertificate = await prisma.courseEnrollment.findUnique({
@@ -217,29 +213,32 @@ async function main() {
     });
 
     const falseNotificationCount = Math.floor(Math.random() * 5) + 1;
-
     // Generate multiple 'false' status notifications
     for (let i = 0; i < falseNotificationCount; i++) {
       await prisma.notifications.create({
         data: {
+          notification_id,
           enroll_id: enrollment.enroll_id,
           status: false,
           user_viewed: false,
           created_date: faker.date.past(),
         },
       });
+      notification_id +=1 ;
     }
 
     // If the enrollment has a certificate, create one 'true' status notification at the end
     if (hasCertificate?.course_certificate_url) {
       await prisma.notifications.create({
         data: {
+          notification_id,
           enroll_id: enrollment.enroll_id,
           status: true,
           user_viewed: false,
           created_date: faker.date.recent(),
         },
       });
+      notification_id += 1;
     }
   }
 

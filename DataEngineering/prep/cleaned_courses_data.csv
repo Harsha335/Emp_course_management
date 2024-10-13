@@ -1,19 +1,19 @@
 course_id,course_name,course_description,course_difficulty_level,course_duration_in_weeks
 100,Commissioning editor Fundamentals,Loss give employee ball. Eye level popular apply see moment.,INTERMEDIATE,20
 101,Neurosurgeon Fundamentals,She change picture. Produce owner voice if. Different leave third city.,EXPERT,4
+9,MERN stack,"A MERN stack course covers the integration of four key technologies: MongoDB, Express.js, React, and Node.js. It teaches how to build full-stack web applications, from front-end user interfaces to back-end APIs and databases. The course focuses on developing scalable, dynamic web applications using JavaScript across the stack.",INTERMEDIATE,6
+10,Reactjs,"A React.js course typically covers the fundamentals of building dynamic user interfaces using components, JSX, and state management. It introduces key concepts like props, hooks, and routing for creating responsive web applications. Advanced topics may include managing global state with tools like Redux, optimizing performance, and integrating with backend APIs.",BEGINNER,2
+12,Machine Learning,"A machine learning (ML) learning path is a structured curriculum designed to guide learners through the various stages of mastering machine learning concepts and techniques. It typically includes foundational topics like statistics and programming, advanced topics such as neural networks and deep learning, and practical applications through hands-on projects. Following a learning path helps learners systematically build their skills and knowledge, ensuring they are well-prepared for real-world ML challenges.",EXPERT,6
 102,"Merchandiser, retail Fundamentals",Change finish production realize president. Option customer understand act any.,BEGINNER,8
 103,Arts development officer Fundamentals,Shoulder pressure subject notice determine sister ability professional.,INTERMEDIATE,12
 104,"Embryologist, clinical Fundamentals",Interview huge agree. They wish analysis city.,BEGINNER,12
 105,Marketing executive Fundamentals,Apply bring music institution certain spring.,INTERMEDIATE,8
 106,Mechanical engineer Fundamentals,Business heart matter experience.,EXPERT,12
 107,Occupational hygienist Fundamentals,Red true factor. Hot quality outside road each final key sing.,EXPERT,4
-10,Reactjs,"A React.js course typically covers the fundamentals of building dynamic user interfaces using components, JSX, and state management. It introduces key concepts like props, hooks, and routing for creating responsive web applications. Advanced topics may include managing global state with tools like Redux, optimizing performance, and integrating with backend APIs.",BEGINNER,2
 108,Arboriculturist Fundamentals,East dog Mrs summer factor remember yeah. Any budget wonder like reveal travel.,INTERMEDIATE,4
 109,IT trainer Fundamentals,Training get security her American garden Democrat despite.,INTERMEDIATE,12
 110,Site engineer Fundamentals,Yard experience support. Edge enter economic note over.,INTERMEDIATE,8
-12,Machine Learning,"A machine learning (ML) learning path is a structured curriculum designed to guide learners through the various stages of mastering machine learning concepts and techniques. It typically includes foundational topics like statistics and programming, advanced topics such as neural networks and deep learning, and practical applications through hands-on projects. Following a learning path helps learners systematically build their skills and knowledge, ensuring they are well-prepared for real-world ML challenges.",EXPERT,6
 111,"Loss adjuster, chartered Fundamentals",Fund food art hold buy. Common politics level stand.,EXPERT,20
-9,MERN stack,"A MERN stack course covers the integration of four key technologies: MongoDB, Express.js, React, and Node.js. It teaches how to build full-stack web applications, from front-end user interfaces to back-end APIs and databases. The course focuses on developing scalable, dynamic web applications using JavaScript across the stack.",INTERMEDIATE,6
 112,Exercise physiologist Fundamentals,Sometimes participant degree without style build notice.,EXPERT,16
 113,Theatre stage manager Fundamentals,Few operation language statement defense. Able third draw child.,INTERMEDIATE,4
 114,Travel agency manager Fundamentals,Upon authority reflect democratic. Guess too against pretty remain short heavy.,BEGINNER,16

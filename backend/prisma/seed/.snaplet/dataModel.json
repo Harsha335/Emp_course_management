@@ -1,0 +1,1333 @@
+{
+  "models": {
+    "Course": {
+      "id": "public.Course",
+      "schemaName": "public",
+      "tableName": "Course",
+      "fields": [
+        {
+          "id": "public.Course.course_id",
+          "name": "course_id",
+          "columnName": "course_id",
+          "type": "int4",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": {
+            "identifier": "\"public\".\"Course_course_id_seq\"",
+            "increment": 1,
+            "start": 1
+          },
+          "hasDefaultValue": true,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.Course.course_name",
+          "name": "course_name",
+          "columnName": "course_name",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.Course.duration",
+          "name": "duration",
+          "columnName": "duration",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.Course.course_img_url",
+          "name": "course_img_url",
+          "columnName": "course_img_url",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.Course.description",
+          "name": "description",
+          "columnName": "description",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.Course.difficulty_level",
+          "name": "difficulty_level",
+          "columnName": "difficulty_level",
+          "type": "DifficultyLevel",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.Course.course_file_url",
+          "name": "course_file_url",
+          "columnName": "course_file_url",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.Course.createdAt",
+          "name": "createdAt",
+          "columnName": "createdAt",
+          "type": "timestamp",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "CourseEnrollment",
+          "type": "CourseEnrollment",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "CourseEnrollmentToCourse",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "LearningPathMap",
+          "type": "LearningPathMap",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "LearningPathMapToCourse",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "QuestionBank",
+          "type": "QuestionBank",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "QuestionBankToCourse",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "Course_pkey",
+          "fields": [
+            "course_id"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "Course_course_name_difficulty_level_key",
+          "fields": [
+            "course_name",
+            "difficulty_level"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
+    "CourseEngageLogs": {
+      "id": "public.CourseEngageLogs",
+      "schemaName": "public",
+      "tableName": "CourseEngageLogs",
+      "fields": [
+        {
+          "id": "public.CourseEngageLogs.enroll_id",
+          "name": "enroll_id",
+          "columnName": "enroll_id",
+          "type": "int4",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.CourseEngageLogs.start_time",
+          "name": "start_time",
+          "columnName": "start_time",
+          "type": "timestamp",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.CourseEngageLogs.time_spent_in_sec",
+          "name": "time_spent_in_sec",
+          "columnName": "time_spent_in_sec",
+          "type": "int4",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "CourseEnrollment",
+          "type": "CourseEnrollment",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "CourseEngageLogsToCourseEnrollment",
+          "relationFromFields": [
+            "enroll_id"
+          ],
+          "relationToFields": [
+            "enroll_id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "CourseEngageLogs_enroll_id_start_time_key",
+          "fields": [
+            "enroll_id",
+            "start_time"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
+    "CourseEnrollment": {
+      "id": "public.CourseEnrollment",
+      "schemaName": "public",
+      "tableName": "CourseEnrollment",
+      "fields": [
+        {
+          "id": "public.CourseEnrollment.enroll_id",
+          "name": "enroll_id",
+          "columnName": "enroll_id",
+          "type": "int4",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": {
+            "identifier": "\"public\".\"CourseEnrollment_enroll_id_seq\"",
+            "increment": 1,
+            "start": 1
+          },
+          "hasDefaultValue": true,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.CourseEnrollment.emp_id",
+          "name": "emp_id",
+          "columnName": "emp_id",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.CourseEnrollment.course_id",
+          "name": "course_id",
+          "columnName": "course_id",
+          "type": "int4",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.CourseEnrollment.course_certificate_url",
+          "name": "course_certificate_url",
+          "columnName": "course_certificate_url",
+          "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.CourseEnrollment.test_score",
+          "name": "test_score",
+          "columnName": "test_score",
+          "type": "float8",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.CourseEnrollment.current_page",
+          "name": "current_page",
+          "columnName": "current_page",
+          "type": "int4",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.CourseEnrollment.total_pages",
+          "name": "total_pages",
+          "columnName": "total_pages",
+          "type": "int4",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.CourseEnrollment.createdAt",
+          "name": "createdAt",
+          "columnName": "createdAt",
+          "type": "timestamp",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "Course",
+          "type": "Course",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "CourseEnrollmentToCourse",
+          "relationFromFields": [
+            "course_id"
+          ],
+          "relationToFields": [
+            "course_id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "Employee",
+          "type": "Employee",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "CourseEnrollmentToEmployee",
+          "relationFromFields": [
+            "emp_id"
+          ],
+          "relationToFields": [
+            "emp_id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "CourseEngageLogs",
+          "type": "CourseEngageLogs",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "CourseEngageLogsToCourseEnrollment",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "Notifications",
+          "type": "Notifications",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "NotificationsToCourseEnrollment",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "CourseEnrollment_pkey",
+          "fields": [
+            "enroll_id"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "CourseEnrollment_emp_id_course_id_key",
+          "fields": [
+            "course_id",
+            "emp_id"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
+    "Employee": {
+      "id": "public.Employee",
+      "schemaName": "public",
+      "tableName": "Employee",
+      "fields": [
+        {
+          "id": "public.Employee.emp_id",
+          "name": "emp_id",
+          "columnName": "emp_id",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.Employee.email",
+          "name": "email",
+          "columnName": "email",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.Employee.emp_name",
+          "name": "emp_name",
+          "columnName": "emp_name",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.Employee.designation",
+          "name": "designation",
+          "columnName": "designation",
+          "type": "Designation",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "User",
+          "type": "User",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "EmployeeToUser",
+          "relationFromFields": [
+            "emp_id"
+          ],
+          "relationToFields": [
+            "user_id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "CourseEnrollment",
+          "type": "CourseEnrollment",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "CourseEnrollmentToEmployee",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "Employee_pkey",
+          "fields": [
+            "emp_id"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "Employee_email_key",
+          "fields": [
+            "email"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
+    "LearningPath": {
+      "id": "public.LearningPath",
+      "schemaName": "public",
+      "tableName": "LearningPath",
+      "fields": [
+        {
+          "id": "public.LearningPath.learning_path_id",
+          "name": "learning_path_id",
+          "columnName": "learning_path_id",
+          "type": "int4",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": {
+            "identifier": "\"public\".\"LearningPath_learning_path_id_seq\"",
+            "increment": 1,
+            "start": 1
+          },
+          "hasDefaultValue": true,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.LearningPath.description",
+          "name": "description",
+          "columnName": "description",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.LearningPath.path_name",
+          "name": "path_name",
+          "columnName": "path_name",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "LearningPathMap",
+          "type": "LearningPathMap",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "LearningPathMapToLearningPath",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "LearningPath_pkey",
+          "fields": [
+            "learning_path_id"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "LearningPath_path_name_key",
+          "fields": [
+            "path_name"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
+    "LearningPathMap": {
+      "id": "public.LearningPathMap",
+      "schemaName": "public",
+      "tableName": "LearningPathMap",
+      "fields": [
+        {
+          "id": "public.LearningPathMap.course_id",
+          "name": "course_id",
+          "columnName": "course_id",
+          "type": "int4",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.LearningPathMap.learning_path_id",
+          "name": "learning_path_id",
+          "columnName": "learning_path_id",
+          "type": "int4",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "name": "Course",
+          "type": "Course",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "LearningPathMapToCourse",
+          "relationFromFields": [
+            "course_id"
+          ],
+          "relationToFields": [
+            "course_id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "LearningPath",
+          "type": "LearningPath",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "LearningPathMapToLearningPath",
+          "relationFromFields": [
+            "learning_path_id"
+          ],
+          "relationToFields": [
+            "learning_path_id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "LearningPathMap_pkey",
+          "fields": [
+            "course_id",
+            "learning_path_id"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
+    "Notifications": {
+      "id": "public.Notifications",
+      "schemaName": "public",
+      "tableName": "Notifications",
+      "fields": [
+        {
+          "id": "public.Notifications.notification_id",
+          "name": "notification_id",
+          "columnName": "notification_id",
+          "type": "int4",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": {
+            "identifier": "\"public\".\"Notifications_notification_id_seq\"",
+            "increment": 1,
+            "start": 1
+          },
+          "hasDefaultValue": true,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.Notifications.enroll_id",
+          "name": "enroll_id",
+          "columnName": "enroll_id",
+          "type": "int4",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.Notifications.status",
+          "name": "status",
+          "columnName": "status",
+          "type": "bool",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.Notifications.user_viewed",
+          "name": "user_viewed",
+          "columnName": "user_viewed",
+          "type": "bool",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.Notifications.created_date",
+          "name": "created_date",
+          "columnName": "created_date",
+          "type": "timestamp",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "CourseEnrollment",
+          "type": "CourseEnrollment",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "NotificationsToCourseEnrollment",
+          "relationFromFields": [
+            "enroll_id"
+          ],
+          "relationToFields": [
+            "enroll_id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "Notifications_pkey",
+          "fields": [
+            "notification_id"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
+    "QuestionBank": {
+      "id": "public.QuestionBank",
+      "schemaName": "public",
+      "tableName": "QuestionBank",
+      "fields": [
+        {
+          "id": "public.QuestionBank.test_id",
+          "name": "test_id",
+          "columnName": "test_id",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.QuestionBank.course_id",
+          "name": "course_id",
+          "columnName": "course_id",
+          "type": "int4",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.QuestionBank.time_per_question_in_sec",
+          "name": "time_per_question_in_sec",
+          "columnName": "time_per_question_in_sec",
+          "type": "int4",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "Course",
+          "type": "Course",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "QuestionBankToCourse",
+          "relationFromFields": [
+            "course_id"
+          ],
+          "relationToFields": [
+            "course_id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "Questions",
+          "type": "Questions",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "QuestionsToQuestionBank",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "QuestionBank_pkey",
+          "fields": [
+            "test_id"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "QuestionBank_course_id_key",
+          "fields": [
+            "course_id"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
+    "Questions": {
+      "id": "public.Questions",
+      "schemaName": "public",
+      "tableName": "Questions",
+      "fields": [
+        {
+          "id": "public.Questions.question_id",
+          "name": "question_id",
+          "columnName": "question_id",
+          "type": "int4",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.Questions.question",
+          "name": "question",
+          "columnName": "question",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.Questions.options",
+          "name": "options",
+          "columnName": "options",
+          "type": "text[]",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.Questions.isMultipleChoice",
+          "name": "isMultipleChoice",
+          "columnName": "isMultipleChoice",
+          "type": "bool",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.Questions.answers",
+          "name": "answers",
+          "columnName": "answers",
+          "type": "int4[]",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.Questions.test_id",
+          "name": "test_id",
+          "columnName": "test_id",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "name": "QuestionBank",
+          "type": "QuestionBank",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "QuestionsToQuestionBank",
+          "relationFromFields": [
+            "test_id"
+          ],
+          "relationToFields": [
+            "test_id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "Questions_question_id_test_id_key",
+          "fields": [
+            "question_id",
+            "test_id"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
+    "User": {
+      "id": "public.User",
+      "schemaName": "public",
+      "tableName": "User",
+      "fields": [
+        {
+          "id": "public.User.user_id",
+          "name": "user_id",
+          "columnName": "user_id",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.User.password",
+          "name": "password",
+          "columnName": "password",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.User.role",
+          "name": "role",
+          "columnName": "role",
+          "type": "Role",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.User.createdAt",
+          "name": "createdAt",
+          "columnName": "createdAt",
+          "type": "timestamp",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "Employee",
+          "type": "Employee",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "EmployeeToUser",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "User_pkey",
+          "fields": [
+            "user_id"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
+    "_prisma_migrations": {
+      "id": "public._prisma_migrations",
+      "schemaName": "public",
+      "tableName": "_prisma_migrations",
+      "fields": [
+        {
+          "id": "public._prisma_migrations.id",
+          "name": "id",
+          "columnName": "id",
+          "type": "varchar",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": true,
+          "maxLength": 36
+        },
+        {
+          "id": "public._prisma_migrations.checksum",
+          "name": "checksum",
+          "columnName": "checksum",
+          "type": "varchar",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": 64
+        },
+        {
+          "id": "public._prisma_migrations.finished_at",
+          "name": "finished_at",
+          "columnName": "finished_at",
+          "type": "timestamptz",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public._prisma_migrations.migration_name",
+          "name": "migration_name",
+          "columnName": "migration_name",
+          "type": "varchar",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": 255
+        },
+        {
+          "id": "public._prisma_migrations.logs",
+          "name": "logs",
+          "columnName": "logs",
+          "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public._prisma_migrations.rolled_back_at",
+          "name": "rolled_back_at",
+          "columnName": "rolled_back_at",
+          "type": "timestamptz",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public._prisma_migrations.started_at",
+          "name": "started_at",
+          "columnName": "started_at",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public._prisma_migrations.applied_steps_count",
+          "name": "applied_steps_count",
+          "columnName": "applied_steps_count",
+          "type": "int4",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "_prisma_migrations_pkey",
+          "fields": [
+            "id"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    }
+  },
+  "enums": {
+    "Designation": {
+      "schemaName": "public",
+      "values": [
+        {
+          "name": "PRINCIPAL_SOLUTION_ARCHITECT"
+        },
+        {
+          "name": "SOFTWARE_ENGINEER"
+        },
+        {
+          "name": "SOLUTION_CONSULTANT"
+        },
+        {
+          "name": "SOLUTION_ENABLER"
+        },
+        {
+          "name": "SR_SOFTWARE_ENGINEER"
+        },
+        {
+          "name": "TECHNOLOGY_SOLUTION_ARCHITECT"
+        }
+      ]
+    },
+    "DifficultyLevel": {
+      "schemaName": "public",
+      "values": [
+        {
+          "name": "BASIC"
+        },
+        {
+          "name": "BEGINNER"
+        },
+        {
+          "name": "EXPERT"
+        },
+        {
+          "name": "INTERMEDIATE"
+        }
+      ]
+    },
+    "Role": {
+      "schemaName": "public",
+      "values": [
+        {
+          "name": "ADMIN"
+        },
+        {
+          "name": "EMPLOYEE"
+        }
+      ]
+    }
+  }
+}

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addCourse, allCourses, courseEmployeeRelation, courseEmployeeRelationUpdate, getPDF, assignedCoursesDetails, updateAssignedCourse, getAllLearningPaths, addLearningPath, getCourseLearningPaths, coursesCountIncrease, avgTimeSpentIncrease, courseEnrollmentIncrease, avgTimeSpentForPeriods, topTrendingCoures, empAvgTimeSpentForPeriods } from "../controllers/courseController";
+import { addCourse, allCourses, courseEmployeeRelation, courseEmployeeRelationUpdate, getPDF, assignedCoursesDetails, updateAssignedCourse, getAllLearningPaths, addLearningPath, getCourseLearningPaths, coursesCountIncrease, avgTimeSpentIncrease, courseEnrollmentIncrease, avgTimeSpentForPeriods, topTrendingCoures, empAvgTimeSpentForPeriods, getPredictedLearningPath } from "../controllers/courseController";
 import { verifyAdmin, verifyUser } from "../middleware/verifyUser";
 // Multer configuration
 import multer from 'multer';
@@ -29,5 +29,7 @@ router.get('/avgTimeSpentForPeriods', verifyAdmin, avgTimeSpentForPeriods);
 router.get('/topTrendingCoures', verifyAdmin, topTrendingCoures);
 
 router.get('/empAvgTimeSpentForPeriods', verifyUser, empAvgTimeSpentForPeriods);
+
+router.get('/predictLearningPath', verifyUser, getPredictedLearningPath);
 
 export default router;
