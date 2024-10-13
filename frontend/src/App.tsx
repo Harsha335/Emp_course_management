@@ -13,6 +13,7 @@ import CreateTest from "./components/Admin/CreateTest";
 import TestWindow from "./components/Employee/Courses/TestWindow";
 import AdminNotifications from "./components/Admin/Notifications";
 import Notifications from "./components/Employee/Notifications";
+import RecommendedCourses from "./components/Employee/RecommendedCourses";
 
 
 
@@ -25,6 +26,7 @@ function App() {
           <Route path="/dashboard" element={<EmployeeDashboard/>}/>
           <Route path="/courses" element={<Courses/>}/>
           <Route path="/notifications" element={<Notifications/>}/>
+          <Route path="/recommendedCourses" element={<RecommendedCourses/>}/>
         </Route>
           <Route path="/test" element={<TestWindow/>}/>
         <Route element={<AdminProtectedRoute/>}>

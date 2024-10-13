@@ -19,6 +19,9 @@ const AddCourse = () => {
   });
   const [addedLearningPaths, setAddedLearningPaths] = useState<{ learning_path_id: number; path_name: string }[]>([]);  // for storing selected learning path data
   const [selectedLearningPath, setSelectedLearningPath] = useState<string | 'new'>(''); // current selected value ('', otherLearningPath_id ,new)
+  const [allCourses, setAllCourses] = useState<{ course_id: number; course_name: string; difficulty_level: string }[]>([]);
+  const [prerequisites, setPrerequisites] = useState<{ course_id: number; course_name: string; difficulty_level: string }[]>([]);
+
 
   const [formData, setFormData] = useState<formType>({
     course_name: '',
@@ -43,6 +46,35 @@ const AddCourse = () => {
 
     fetchLearningPaths();
   }, []);
+
+  // fetch all courses
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await axiosTokenInstance.get('/api/courses/allCourses');
+        setAllCourses(response.data.courses);
+      } catch (err) {
+        console.error('Error fetching courses:', err);
+      }
+    };
+  
+    fetchCourses();
+  }, []);
+  const handlePrerequisiteChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedCourseId = parseInt(event.target.value);
+    if (selectedCourseId) {
+      const selectedCourse = allCourses.find((course) => course.course_id === selectedCourseId);
+      if (selectedCourse && !prerequisites.find((course) => course.course_id === selectedCourseId)) {
+        setPrerequisites((prev) => [...prev, selectedCourse]);
+      }
+    }
+  };
+  
+  const handleRemovePrerequisite = (course_id: number) => {
+    setPrerequisites((prev) => prev.filter((course) => course.course_id !== course_id));
+  };
+  
+  
 
   // Handle image and file changes
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,7 +150,7 @@ const AddCourse = () => {
       formDataToSend.append('description', formData.description);
       formData.learning_path_ids.forEach(item => formDataToSend.append("learning_path_ids[]", item.toString()));
       // formDataToSend.append('learning_path_ids[]', formData.learning_path_ids?.toString() || '');
-
+      prerequisites.forEach(course => formDataToSend.append('prerequisites[]', course.course_id.toString()));
       // Append image and file
       if (formData.course_img) {
         formDataToSend.append('course_img', formData.course_img);
@@ -152,7 +184,7 @@ const AddCourse = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center">
       <div className="flex flex-col md:flex-row w-3/4 border-2 border-gray-300 rounded-lg p-8 gap-6 bg-white shadow-lg">
         {/* Left side: Form */}
         <div className="w-full md:w-1/2">
@@ -277,6 +309,30 @@ const AddCourse = () => {
                 </button>
               </div>
             ))}
+          </div>
+
+          {/* --------------------here add prerequisites--------------- */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Select Prerequisite Courses</label>
+            <select onChange={handlePrerequisiteChange} className="mt-2 block w-full p-2 border border-gray-300 rounded-md">
+              <option value="">-- Select Prerequisite Course --</option>
+              {allCourses
+                .map((course) => (
+                  <option key={course.course_id} value={course.course_id}>
+                    {course.course_name} ({course.difficulty_level})
+                  </option>
+                ))}
+            </select>
+
+            {/* Display selected prerequisites with remove option */}
+            <div className="mt-4 flex flex-wrap gap-2">
+              {prerequisites.map((course) => (
+                <div key={course.course_id} className="bg-blue-100 text-blue-700 px-3 py-1 rounded-md flex items-center">
+                  {course.course_name} ({course.difficulty_level})
+                  <button onClick={() => handleRemovePrerequisite(course.course_id)} className="ml-2 text-red-500 hover:text-red-700">×</button>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Image Upload */}

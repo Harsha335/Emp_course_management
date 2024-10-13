@@ -50,6 +50,11 @@ export const employeeNavbarComponents = {
             name: 'Notifications',
             icons: (await import('@mui/icons-material/CircleNotifications')).default,
             url: '/notifications',
+        },
+        {
+            name: 'Recommended Courses',
+            icons: (await import('@mui/icons-material/AssistantOutlined')).default,
+            url: '/recommendedCourses',
         }
     ]
 }

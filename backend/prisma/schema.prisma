@@ -38,6 +38,7 @@ model Course {
   // Relationships
   CourseEnrollment CourseEnrollment[]
   QuestionBank    QuestionBank? // Made optional
+  Prerequisites    Prerequisites?   // One-to-one relationship
   LearningPathMap  LearningPathMap[] // Many-to-many relationship
   createdAt       DateTime @default(now())
 
@@ -51,6 +52,15 @@ enum DifficultyLevel {
   BEGINNER
   INTERMEDIATE
   EXPERT
+}
+
+model Prerequisites {
+  course_id           Int        @id // Make it a primary key
+  prerequisite_courses Int[]      // Array of prerequisite course IDs
+
+  // Relationships
+  Course Course @relation(fields: [course_id], references: [course_id]) // One-to-one relation with Course
+  @@unique([course_id])
 }
 
 model LearningPath {

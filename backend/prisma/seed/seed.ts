@@ -56,6 +56,11 @@ async function main() {
       enroll_id: { gte: 100 },
     },
   });
+  await prisma.Prerequisites.deleteMany({
+    where:{
+      course_id: {gte: 100}
+    }
+  })
   
   // Clear courses and learning paths (from ID 100 to 199 for courses and 100 to 114 for learning paths)
   await prisma.course.deleteMany({
@@ -115,6 +120,7 @@ async function main() {
   const courses = await readCSV(path.join(__dirname, '../uploads_fakeData/courses.csv'));
   const learningPaths = await readCSV(path.join(__dirname, '../uploads_fakeData/learning_paths.csv'));
   const learningPathMap = await readCSV(path.join(__dirname, '../uploads_fakeData/learning_path_map.csv'));
+  const prerequisites_data = await readCSV(path.join(__dirname, '../uploads_fakeData/prerequisites.csv'));
 
   // Insert courses into the database
   for (const course of courses) {
@@ -129,6 +135,21 @@ async function main() {
         course_file_url: faker.internet.url(),//course.course_file_url || faker.internet.url(), // Provide a fallback value using faker
       },
     });
+  }
+
+  for(const prerequisite of prerequisites_data){
+    // Step 1: Clean up the string to remove unwanted characters
+    const inputString = prerequisite.prerequisites.replace(/[\[\]_":]/g, ''); // Remove [, ], _, :, ", and spaces
+    // Step 2: Split the string by commas to get individual number strings
+    let stringArray = inputString.split(',');
+    // Step 3: Convert the string array into an array of integers
+    let intArray = stringArray.map(item => parseInt(item.trim(), 10));
+    await prisma.Prerequisites.create({
+      data: {
+        course_id: Number(prerequisite.course_id),
+        prerequisite_courses: intArray
+      }
+    })
   }
 
   // Insert learning paths into the database

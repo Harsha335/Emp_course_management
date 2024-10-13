@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addCourse, allCourses, courseEmployeeRelation, courseEmployeeRelationUpdate, getPDF, assignedCoursesDetails, updateAssignedCourse, getAllLearningPaths, addLearningPath, getCourseLearningPaths, coursesCountIncrease, avgTimeSpentIncrease, courseEnrollmentIncrease, avgTimeSpentForPeriods, topTrendingCoures, empAvgTimeSpentForPeriods, getPredictedLearningPath } from "../controllers/courseController";
+import { addCourse, allCourses, courseEmployeeRelation, courseEmployeeRelationUpdate, getPDF, assignedCoursesDetails, updateAssignedCourse, getAllLearningPaths, addLearningPath, getCourseLearningPaths, coursesCountIncrease, avgTimeSpentIncrease, courseEnrollmentIncrease, avgTimeSpentForPeriods, topTrendingCoures, empAvgTimeSpentForPeriods, getPredictedLearningPath,assignCourse } from "../controllers/courseController";
 import { verifyAdmin, verifyUser } from "../middleware/verifyUser";
 // Multer configuration
 import multer from 'multer';
@@ -11,7 +11,7 @@ const router = Router();
 router.post('/addCourse', verifyAdmin, upload.fields([{ name: 'course_img', maxCount: 1 }, { name: 'course_file', maxCount: 1 }]), addCourse);
 router.get('/allCourses', verifyAdmin, allCourses);
 router.get('/courseEmp/:courseId', verifyAdmin, courseEmployeeRelation);
-router.post('/courseEmp/:courseId', verifyAdmin, courseEmployeeRelationUpdate);
+router.post('/courseEmp/:courseId', verifyAdmin, courseEmployeeRelationUpdate); // add course to emp
 
 router.post('/getPdf', verifyUser, getPDF);
 
@@ -31,5 +31,6 @@ router.get('/topTrendingCoures', verifyAdmin, topTrendingCoures);
 router.get('/empAvgTimeSpentForPeriods', verifyUser, empAvgTimeSpentForPeriods);
 
 router.get('/predictLearningPath', verifyUser, getPredictedLearningPath);
+router.post('/assignCourse', verifyUser, assignCourse); // add course to emp
 
 export default router;

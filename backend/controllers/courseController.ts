@@ -49,8 +49,8 @@ const uploadToDropbox = async (fileBuffer: Buffer, fileName: string): Promise<st
 
 export const addCourse = async (req: CustomRequest, res: Response) => {
     try {
-        const { course_name, duration, difficulty_level, description, tags } = req.body;
-        
+        const { course_name, duration, difficulty_level, description } = req.body;
+        const prerequisites: string[] = req.body.prerequisites;
         // Type assertion for req.files
         const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
@@ -85,6 +85,12 @@ export const addCourse = async (req: CustomRequest, res: Response) => {
                 course_file_url: pdfPublicUrl, // Save the course file URL
             },
         });
+        await prisma.prerequisites.create({
+          data:{
+            course_id: newCourse.course_id,
+            prerequisite_courses: prerequisites.map(prev_id => Number(prev_id))
+          }
+        })
 
         res.status(201).json({ message: 'Course added successfully', course: newCourse });
     } catch (error) {
@@ -778,12 +784,102 @@ export const getPredictedLearningPath = async (req: CustomRequest, res: Response
 
     // Send the cleaned data to Flask API for prediction
     const response = await axios.post(`${process.env.FLASK_SERVER}/predict`, cleaned_course_enrollment_data);
-    console.log("RESPONSE: ",response);
-    // Send prediction result back to the client
-    res.status(200).json(response.data);
-
+    const predicted_learning_path_id = response.data.predicted_learning_path_id;
+    console.log("predicted learning_path_id: ",predicted_learning_path_id);
+    const recommended_learning_path = await prisma.learningPath.findFirst({
+      where:{
+        learning_path_id: predicted_learning_path_id
+      }
+    })
+    const data = await suggestCoursesForEmployee(predicted_learning_path_id, emp_id);
+    res.status(200).json({recommended_learning_path, data});
   } catch (error) {
     console.error("Error fetching PredictedLearningPath for employee:", error);
     res.status(500).json({ error: 'Error fetching PredictedLearningPath' });
   }
 };
+
+async function suggestCoursesForEmployee(learningPathId: number, empId: string) {
+  try {
+    // Step 1: Fetch all courses in the given learning path
+    const learningPathCourses = await prisma.learningPathMap.findMany({
+      where: {
+        learning_path_id: learningPathId,
+      },
+      include: {
+        course: true,
+      },
+    });
+    // console.log('learningPathCourses: ',learningPathCourses)
+    // Step 2: Fetch all courses the employee is already enrolled in
+    const enrolledCourses = await prisma.courseEnrollment.findMany({
+      where: {
+        emp_id: empId,
+      },
+      select: {
+        course_id: true,
+      },
+    });
+    const enrolledCourseIds = enrolledCourses.map(enrollment => enrollment.course_id);
+    // console.log('enrolledCourseIds: ',enrolledCourseIds)
+    // Step 3: Fetch prerequisites for all courses in the learning path
+    const prerequisites = await prisma.prerequisites.findMany({
+      where: {
+        course_id: {
+          in: learningPathCourses.map(course => course.course_id),
+        },
+      },
+    });
+    // console.log('prerequisites: ',prerequisites)
+
+    // Step 4: Filter courses that meet the conditions
+    const suggestedCourses = learningPathCourses.filter(course => {
+      // Check if the course is already enrolled
+      if (enrolledCourseIds.includes(course.course_id)) {
+        return false;
+      }
+
+      // Get prerequisites for this course
+      const coursePrerequisites = prerequisites.find(
+        prereq => prereq.course_id === course.course_id
+      )?.prerequisite_courses || [];
+
+      // If the course has no prerequisites, suggest it
+      if (coursePrerequisites.length === 0) {
+        return true;
+      }
+
+      // Check if all prerequisite courses are completed/enrolled
+      const prerequisitesSatisfied = coursePrerequisites.every(prereqCourseId =>
+        enrolledCourseIds.includes(prereqCourseId)
+      );
+
+      // Only suggest the course if all prerequisites are satisfied
+      return prerequisitesSatisfied;
+    });
+    // console.log('suggestedCourses',suggestedCourses)
+
+    // Step 5: Return suggested courses
+    return suggestedCourses.map(course => course.course);
+  } catch (error) {
+    console.error('Error suggesting courses:', error);
+    throw new Error('Unable to suggest courses at the moment.');
+  }
+}
+
+export const assignCourse = async (req: CustomRequest, res: Response) => {
+  try {
+    const emp_id = req.user?.user_id || 'JMD001';
+    const {course_id} = req.body;
+    await prisma.courseEnrollment.create({
+      data:{
+        emp_id,
+        course_id
+      }
+    });
+    res.status(200).json({message: 'Assigned successfully'});
+  }catch(error){
+    console.error('Error assignCourse :', error);
+    res.status(500).json({ error: 'Error assignCourse' });
+  }
+}
