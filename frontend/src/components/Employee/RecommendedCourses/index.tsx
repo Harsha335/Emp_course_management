@@ -3,7 +3,7 @@ import CourseCard from "./CourseCard"
 import CourseDetailsPopup from "../Courses/CourseDetailsPopup";
 // import PDFViewer from "../Courses/PdfViewer";
 import axiosTokenInstance from "../../../api_calls/api_token_instance";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 
@@ -38,7 +38,7 @@ export interface LearningPathType {
 }
 
 const RecommendedCourses = () => {
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const [assignedCourses, setAssignedCourses] = useState<CourseType[]>();
     const [coursePopupToggleData, setCoursePopupToggleData] = useState<CourseType | null>();
     const [recommended_learning_path, set_recommended_learning_path] = useState<LearningPathType | null>();
