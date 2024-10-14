@@ -112,10 +112,10 @@ const EmployeeDashboard = () => {
   return (
         <div className='flex-1 flex flex-col gap-8 p-4'>
             <div className='flex flex-row flex-wrap gap-5 justify-around'>
-                <DashboardCard title={"Courses Assigned"} value={totalCoursesAssigned} delta_per={totalCoursesAssignedDeltaPer} color="indigo" Icon={PeopleIcon}/>
-                <DashboardCard title="Certificates Count" value={totalCertificates} delta_per={totalCertificatesDeltaPer} color="teal" Icon={BookIcon}/>
-                <DashboardCard title="Avg Test Score" value={avgTestScore} delta_per={avgTestScoreDeltaPer} color="orange" Icon={AccessTimeFilledIcon}/>
-                <DashboardCard title="Avg Time Spent" value={avgTimeSpent} delta_per={avgTimeSpentDeltaPer} color="green" Icon={SubscriptionsIcon}/>
+                <DashboardCard title={"Courses Assigned"} value={totalCoursesAssigned+''} delta_per={totalCoursesAssignedDeltaPer} color="indigo" Icon={PeopleIcon}/>
+                <DashboardCard title="Certificates Count" value={totalCertificates+''} delta_per={totalCertificatesDeltaPer} color="teal" Icon={BookIcon}/>
+                <DashboardCard title="Avg Test Score" value={avgTestScore.toFixed(2)} delta_per={avgTestScoreDeltaPer} color="orange" Icon={AccessTimeFilledIcon}/>
+                <DashboardCard title="Avg Time Spent" value={avgTimeSpent.toFixed(2)} delta_per={avgTimeSpentDeltaPer} color="green" Icon={SubscriptionsIcon}/>
             </div>
             {/* <div className='  flex flex-col xl:flex-row gap-4'> */}
             <div className='w-full bg-white rounded-xl drop-shadow-lg p-4 flex flex-col'>

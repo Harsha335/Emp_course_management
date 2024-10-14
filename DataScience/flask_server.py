@@ -15,7 +15,7 @@ def predict():
     try:
         # Get the JSON data from the request
         data = request.json
-        print(data)
+        # print(data)
         # Create a DataFrame
         df = pd.DataFrame(data)
 
@@ -66,8 +66,8 @@ def predict():
         file_path = './rf_predicted_best_learning_paths.csv'  # Update with your actual file path
         df = pd.read_csv(file_path)
         # Fetch the column names from the DataFrame
-        required_combined_scores = df.columns.tolist()[1:-2]
-        
+        required_combined_scores = df.columns[df.columns.str.contains('combined_score_')].tolist()
+        # print(required_combined_scores)
         # Create an empty DataFrame for input data with the required combined score columns
         input_data = pd.DataFrame(columns=required_combined_scores)
 
@@ -88,7 +88,7 @@ def predict():
         })
     
     except Exception as e:
-        print(e)
+        print("Error: ",e)
         return jsonify({'error': str(e)}), 400
 
 # Run the Flask app

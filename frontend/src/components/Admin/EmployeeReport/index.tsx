@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axiosTokenInstance from '../../../api_calls/api_token_instance';
+import EmployeeReportPopup from './EmployeeReportPopup';
 
 type Employee = {
   emp_id: string;
@@ -63,6 +64,14 @@ const EmployeeReport: React.FC = () => {
   const handleSortToggle = () => {
     setSortAsc(prev => prev === null ? true : prev === false ? null : !prev);
   };
+  const [popUpEmp, setPopUpEmp] = useState<string | null> (null);
+  const popUpEmpPerformance = (e: React.MouseEvent<HTMLTableRowElement, MouseEvent>, emp_id: string) => {
+    e.preventDefault();
+    setPopUpEmp(emp_id);
+  }
+  const closePopUp = () => {
+    setPopUpEmp(null);
+  }
 
   return (
     <div className="p-6">
@@ -106,11 +115,11 @@ const EmployeeReport: React.FC = () => {
         </thead>
         <tbody>
           {paginatedEmployees?.map((emp) => (
-            <tr key={emp.emp_id} className="border-t cursor-pointer hover:bg-gray-200" onClick={() => alert("call popup")}>
+            <tr key={emp.emp_id} className="border-t cursor-pointer hover:bg-gray-200" onClick={(e) => popUpEmpPerformance(e,emp.emp_id)}>
               <td className="p-3">{emp.emp_id}</td>
               <td className="p-3">{emp.emp_name}</td>
               <td className="p-3">{emp.designation}</td>
-              <td className="p-3">{emp.performance_rating ?? 'N/A'}</td>
+              <td className="p-3">{emp.performance_rating ? emp.performance_rating.toFixed(2): 'N/A'}</td>
             </tr>
           ))}
         </tbody>
@@ -136,6 +145,7 @@ const EmployeeReport: React.FC = () => {
           Next
         </button>
       </div>
+      {popUpEmp && <EmployeeReportPopup emp_id={popUpEmp} closePopUp={closePopUp}/>}
     </div>
   );
 };

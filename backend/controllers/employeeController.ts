@@ -8,9 +8,39 @@ interface CustomRequest extends Request {
 // Get all employees
 export const getAllEmployees = async (req: CustomRequest, res: Response) => {
   try {
-    const employees = await prisma.employee.findMany();
-    console.log(employees)
-    res.status(200).json({employees});
+    const employeeScores = await prisma.courseEnrollment.groupBy({
+      by: ['emp_id'],
+      _avg: {
+        test_score: true, // Calculate average test score
+      },
+    });
+    
+    // Step 2: Get employee details for the emp_ids obtained
+    const employeeDetails = await prisma.employee.findMany({
+      where: {
+        emp_id: {
+          in: employeeScores.map(e => e.emp_id), // Match emp_ids from employeeScores
+        },
+      },
+      select: {
+        emp_id: true,
+        emp_name: true,
+        email: true,
+        designation: true,
+      },
+    });
+    
+    // Step 3: Merge employee details with average test scores
+    const mergedData = employeeDetails.map(emp => {
+      const avgScore = employeeScores.find(e => e.emp_id === emp.emp_id)?._avg?.test_score;
+      return {
+        ...emp,
+        performance_rating: avgScore || 0, // Default to 0 if no score found
+      };
+    });
+    
+    console.log(mergedData)
+    res.status(200).json({employees: mergedData});
   } catch (error) {
     res.status(500).json({ error: 'Error fetching employees' });
   }
@@ -121,5 +151,47 @@ export const getEmployeeStatistics = async (req: CustomRequest, res: Response) =
   } catch (err) {
     console.error("Error fetching employee statistics:", err);
     res.status(500).json({ error: 'Error fetching employee statistics' });
+  }
+};
+
+export const getEmployeePerformance = async (req: CustomRequest, res: Response) => {
+  const { emp_id } = req.params;
+
+  try {
+    // Fetch all courses the employee is enrolled in
+    const courseEnrollments = await prisma.courseEnrollment.findMany({
+      where: { emp_id },
+      include: {
+        course: true, // Include course details
+        CourseEngageLogs: true, // Include time spent logs
+      },
+    });
+
+    if (!courseEnrollments.length) {
+      return res.status(404).json({ message: 'No courses found for this employee.' });
+    }
+
+    // Format the response with course progress and other details
+    const courseDetails = courseEnrollments.map(enrollment => {
+      const { current_page, total_pages, test_score, course_certificate_url } = enrollment;
+      const courseName = enrollment.course.course_name;
+      const completionPercentage = current_page && total_pages ? (current_page / total_pages) * 100 : 0;
+
+      // Calculate total time spent on the course
+      const totalTimeSpent = enrollment.CourseEngageLogs.reduce((total, log) => total + log.time_spent_in_sec, 0);
+
+      return {
+        course_name: courseName,
+        completion_percentage: completionPercentage.toFixed(2) + '%',
+        test_score: test_score ? test_score : 'Not Available',
+        total_time_spent_in_seconds: totalTimeSpent,
+        course_certificate_url: course_certificate_url ? course_certificate_url : 'Not Generated',
+      };
+    });
+
+    res.json(courseDetails);
+  } catch (error) {
+    console.error('Error fetching course progress:', error);
+    res.status(500).json({ error: 'An error occurred while fetching course progress.' });
   }
 };

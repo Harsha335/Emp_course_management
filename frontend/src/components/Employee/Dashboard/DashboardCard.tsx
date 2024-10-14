@@ -7,7 +7,7 @@ import { SvgIconTypeMap } from '@mui/material';
 
 type CardPropsType = {
   title: string,
-  value: number,
+  value: string,
   delta_per: number,
   color: string,
   Icon: OverridableComponent<SvgIconTypeMap<{}, "svg">> & {
