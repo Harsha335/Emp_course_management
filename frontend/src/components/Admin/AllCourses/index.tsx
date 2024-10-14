@@ -4,6 +4,7 @@ import axiosTokenInstance from "../../../api_calls/api_token_instance";
 import AssignCoursePopup from "./AssignCoursePopup";
 import CourseDetailsPopup from "./CourseDetailsPopup";
 import PDFViewer from "./PdfViewer";
+import { toast } from "react-toastify";
 
 
 // Enum for difficulty level
@@ -55,6 +56,7 @@ const AllCourses = () => {
     const [pdfUrl, setPdfUrl] = useState<string | null>(null);
     const onViewCourse = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, course: CourseType) => {
         e.stopPropagation();
+        const loadingToast = toast.loading("Loading PDF...");
         const course_file_url: string = course.course_file_url;
         try {
           const response = await axiosTokenInstance.post('/api/courses/getPdf',{course_file_url},{
@@ -73,8 +75,20 @@ const AllCourses = () => {
     
           // Set the URL for rendering in react-pdf
           setPdfUrl(pdfUrl);
+          toast.update(loadingToast, {
+            render: "File opened successful!",
+            type: "success",
+            isLoading: false,
+            autoClose: 2000, // automatically close after 2 seconds
+          });
         } catch (err) {
           console.error('Error fetching the PDF:', err);
+          toast.update(loadingToast, {
+            render: "File is not available !!!",
+            type: "error",
+            isLoading: false,
+            autoClose: 3000,
+          });
         }
     }
 

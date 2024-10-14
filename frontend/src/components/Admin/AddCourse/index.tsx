@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axiosTokenInstance from '../../../api_calls/api_token_instance';
+import { toast } from 'react-toastify';
 
 type formType = {
   course_name: string;
@@ -120,6 +121,7 @@ const AddCourse = () => {
   // Save new learning path
   const handleSaveNewLearningPath = async () => {
     if (newLearningPath.path_name && newLearningPath.description) {
+      const loadingToast = toast.loading("Adding new learning path...");
       try {
         // Save new learning path to the server
         const learningPathResponse = await axiosTokenInstance.post('/api/courses/learningPaths/add', newLearningPath);
@@ -133,15 +135,27 @@ const AddCourse = () => {
         setSelectedLearningPath('');
         // Update learning paths list
         setAllLearningPaths((prev) => ([...prev, { learning_path_id: newLearningPathId, path_name: newLearningPath.path_name }]));
+        toast.update(loadingToast, {
+          render: "Added New learning path!",
+          type: "success",
+          isLoading: false,
+          autoClose: 2000, // automatically close after 2 seconds
+        });
       } catch (err) {
         console.error('Error saving learning path:', err);
+        toast.update(loadingToast, {
+          render: "Error in adding new learning path",
+          type: "error",
+          isLoading: false,
+          autoClose: 3000,
+        });
       }
     }
   };
 
   const handleSubmitForm = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-
+    const loadingToast = toast.loading("Creating new course...");
     try {
       const formDataToSend = new FormData();
       formDataToSend.append('course_name', formData.course_name);
@@ -163,6 +177,12 @@ const AddCourse = () => {
       await axiosTokenInstance.post('/api/courses/addCourse', formDataToSend, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
+      toast.update(loadingToast, {
+        render: "Course created successfully!",
+        type: "success",
+        isLoading: false,
+        autoClose: 2000, // automatically close after 2 seconds
+      });
 
       // Reset form
       setFormData({
@@ -180,6 +200,13 @@ const AddCourse = () => {
 
     } catch (err) {
       console.error('Error submitting course:', err);
+      toast.update(loadingToast, {
+        render: "Error in creating a course. Please try again.",
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+      });
+
     }
   };
 

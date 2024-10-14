@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import DeleteIcon from '@mui/icons-material/Delete';
 import ClearIcon from '@mui/icons-material/Clear';
 import axiosTokenInstance from "../../../api_calls/api_token_instance";
+import { toast } from "react-toastify";
 
 interface Questions {
   question_id : number | null;
@@ -175,10 +176,16 @@ const TestCreationForm = () => {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const loadingToast = toast.loading("Creating a new Test...");
     try{
       for(const question of questions){
         if(question.question.trim().length === 0 || question.options.length === 0 || question.answers.length === 0){
-          alert("Fill question correctly!!!");
+          toast.update(loadingToast, {
+            render: "Fill all questions correctly!!!",
+            type: "error",
+            isLoading: false,
+            autoClose: 3000,
+          });
           return;
         }
       }
@@ -190,8 +197,20 @@ const TestCreationForm = () => {
       const response = await axiosTokenInstance.post('/api/test/updateTest', questionBank);
       console.log(response);
       window.location.reload();
+      toast.update(loadingToast, {
+        render: "Test created successfully!",
+        type: "success",
+        isLoading: false,
+        autoClose: 2000, // automatically close after 2 seconds
+      });
     }catch(err){
       console.log("Error at submit test: ", err);
+      toast.update(loadingToast, {
+        render: "Failed to create Test. Please try again.",
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+      });
     }
   };
 

@@ -4,6 +4,7 @@ import CourseDetailsPopup from "../Courses/CourseDetailsPopup";
 // import PDFViewer from "../Courses/PdfViewer";
 import axiosTokenInstance from "../../../api_calls/api_token_instance";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 
 // Enum for difficulty level
@@ -50,13 +51,26 @@ const RecommendedCourses = () => {
     }
     useEffect(() => {
         const fetchCourses = async () => {
+            const loadingToast = toast.loading("Fetching Recommended Courses...");
             try{
                 const response = await axiosTokenInstance.get("/api/courses/predictLearningPath");
                 console.log(response.data)
                 set_recommended_learning_path(response.data.recommended_learning_path);
                 setAssignedCourses(response.data.data);
+                toast.update(loadingToast, {
+                    render: "Recommended Courses loaded successfully!",
+                    type: "success",
+                    isLoading: false,
+                    autoClose: 2000, // automatically close after 2 seconds
+                  });
             }catch(err){
                 console.log("Error in fetching course data (frontend)");
+                toast.update(loadingToast, {
+                    render: "Failed to load recommendations. Please try again.",
+                    type: "error",
+                    isLoading: false,
+                    autoClose: 3000,
+                  });
             }
         }
         fetchCourses();
@@ -103,13 +117,25 @@ const RecommendedCourses = () => {
     const onClickAssignCourse = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, course_id: number) => {
         e.preventDefault();
         e.stopPropagation();
+        const loadingToast = toast.loading("Assigning Course...");
         try{
             await axiosTokenInstance.post('/api/courses/assignCourse',{
                 course_id
             });
-            alert('course assigned !!');
+            toast.update(loadingToast, {
+                render: "Successfully course assigned!",
+                type: "success",
+                isLoading: false,
+                autoClose: 2000, // automatically close after 2 seconds
+              });
         }catch(err){
             console.log("Error at onClickAssignCourse: ",err);
+            toast.update(loadingToast, {
+                render: "Failed to Assign Course. Please try again.",
+                type: "error",
+                isLoading: false,
+                autoClose: 3000,
+              });
         }
     }
 

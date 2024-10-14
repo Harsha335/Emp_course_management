@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../api_calls/api_instance';
 import { encryptText } from '../../helper_functions/encrypt_decrypt';
+import { toast } from 'react-toastify';
 
 const SigninForm : React.FC = () => {
     const [userId, setUserId] = useState<string>('');
@@ -26,8 +27,15 @@ const SigninForm : React.FC = () => {
     // logining
     const handleSubmit = async (event : React.MouseEvent<HTMLInputElement, MouseEvent>) : Promise<void> => {
         event.preventDefault();
+        const loadingToast = toast.loading("Logging in...");
         if(!validateDetails({userId: userId, password: userPassword})){
             setError('All values required !!');
+            toast.update(loadingToast, {
+                render: "All values required !!",
+                type: "error",
+                isLoading: false,
+                autoClose: 3000,
+              });
             return;
         }
         try{
@@ -42,6 +50,12 @@ const SigninForm : React.FC = () => {
             }else{                  // NAVIGATING TO EMPLOYEE DASHBOARD
                 navigate('/dashboard');
             }
+            toast.update(loadingToast, {
+                render: "Login successful!",
+                type: "success",
+                isLoading: false,
+                autoClose: 2000, // automatically close after 2 seconds
+              });
         }catch(err : unknown){
             if (axios.isAxiosError(err)) {
                 // This is an Axios error, so it has a response property
@@ -51,6 +65,12 @@ const SigninForm : React.FC = () => {
                 // Handle other types of errors (non-Axios errors)
                 console.log("Error at signin handleSubmit: ", err);
             }
+            toast.update(loadingToast, {
+                render: "Login failed. Please try again.",
+                type: "error",
+                isLoading: false,
+                autoClose: 3000,
+              });
         }
     }
 

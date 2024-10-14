@@ -4,6 +4,7 @@ import CourseDetailsPopup from "./CourseDetailsPopup";
 import PDFViewer from "./PdfViewer";
 import axiosTokenInstance from "../../../api_calls/api_token_instance";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 
 // Enum for difficulty level
@@ -67,6 +68,7 @@ const Courses = () => {
     const [pdfPopupToggleData, setPdfPopupToggleData] = useState<PdfPropsDataType | null>(null);
     const onViewCourse = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, assignedCourse: AssignedCourseType) => {
         e.stopPropagation();
+        const loadingToast = toast.loading("Loading PDF ...");
         const course_file_url: string = assignedCourse.course.course_file_url;
         try {
           const response = await axiosTokenInstance.post('/api/courses/getPdf',{course_file_url},{
@@ -85,8 +87,20 @@ const Courses = () => {
     
           const start_time: number = Date.now();
           setPdfPopupToggleData({pdfUrl, start_time, current_page: assignedCourse.current_page, enroll_id: assignedCourse.enroll_id});
+          toast.update(loadingToast, {
+            render: "PDF file Opened Successfully!",
+            type: "success",
+            isLoading: false,
+            autoClose: 2000, // automatically close after 2 seconds
+          });
         } catch (err) {
           console.error('Error fetching the PDF:', err);
+          toast.update(loadingToast, {
+            render: "Error in opening File",
+            type: "error",
+            isLoading: false,
+            autoClose: 3000,
+          });
         }
     }
 
@@ -94,11 +108,12 @@ const Courses = () => {
         e.preventDefault();
         e.stopPropagation();
         if(!assignedCourse.isInQuestionBank){
-            alert("No Questions Recorded");
+            // alert("");
+            toast("No Questions Recorded");
             return;
         }
         if(!assignedCourse.isTestAccessed){
-            alert("Your exam results are under admin review. Please wait for approval.");
+            toast("Your exam results are under admin review. Please wait for approval.");
             return;
         }
         navigate('/test', {state: {course_id:assignedCourse.course.course_id, enroll_id: assignedCourse.enroll_id, course_name: assignedCourse.course.course_name+" ("+assignedCourse.course.difficulty_level+") " }});

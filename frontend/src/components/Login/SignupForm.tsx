@@ -2,6 +2,7 @@ import React, {  useState } from 'react';
 // import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../api_calls/api_instance';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const SignupForm : React.FC = () => {
 
@@ -43,8 +44,15 @@ const SignupForm : React.FC = () => {
     // signup
     const handleSubmit = async (event : React.MouseEvent<HTMLInputElement, MouseEvent>) : Promise<void> => {
         event.preventDefault();
+        const loadingToast = toast.loading("Signup loading...");
         if(!validateDetails(userForm)){
             setError('All values required !!');
+            toast.update(loadingToast, {
+                render: "All values required !!",
+                type: "error",
+                isLoading: false,
+                autoClose: 3000,
+              });        
             return;
         }
         try{
@@ -52,6 +60,12 @@ const SignupForm : React.FC = () => {
             console.log("signup response: ",response);
             // navigate('/login');
             window.location.reload();
+            toast.update(loadingToast, {
+                render: "Signup successful!",
+                type: "success",
+                isLoading: false,
+                autoClose: 2000, // automatically close after 2 seconds
+              });
         }catch(err : unknown){
             if (axios.isAxiosError(err)) {
                 // This is an Axios error, so it has a response property
@@ -61,6 +75,13 @@ const SignupForm : React.FC = () => {
                 // Handle other types of errors (non-Axios errors)
                 console.log("Error at signup handleSubmit: ", err);
             }
+            toast.update(loadingToast, {
+                render: "Signup failed. Please try again.",
+                type: "error",
+                isLoading: false,
+                autoClose: 3000,
+              });
+        
         }
     }
 

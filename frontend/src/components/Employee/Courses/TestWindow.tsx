@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import axiosTokenInstance from '../../../api_calls/api_token_instance';
 import ScorePopup from './ScrorePopup';
 import { formatTime } from '../../../helper_functions/time_format';
+import { toast } from 'react-toastify';
 
 type QuestionType = {
     question_id: number;
@@ -115,6 +116,7 @@ const TestWindow: React.FC = () => {
     };
 
     const handleSubmit = async () => {
+        const loadingToast = toast.loading("Submiting exam...");
         const formattedAnswers = Object.entries(userAnswers).map(([question_id, answers]) => ({
             question_id: Number(question_id),
             answers
@@ -123,8 +125,21 @@ const TestWindow: React.FC = () => {
             console.log(formattedAnswers);
             const response = await axiosTokenInstance.post(`/api/test/attempt/verify-answers`, { enroll_id, test_id, userAnswers: formattedAnswers });
             setScore(response.data);
+            toast.update(loadingToast, {
+                render: "Successfully submited 🥳!",
+                type: "success",
+                isLoading: false,
+                autoClose: 2000, // automatically close after 2 seconds
+              });
         } catch (error) {
             console.error("Error submitting answers: ", error);
+            toast.update(loadingToast, {
+                render: "Submit Exam failed. Please try again.",
+                type: "error",
+                isLoading: false,
+                autoClose: 3000,
+              });
+        
         }
     };
 

@@ -15,6 +15,8 @@ import AdminNotifications from "./components/Admin/Notifications";
 import Notifications from "./components/Employee/Notifications";
 import RecommendedCourses from "./components/Employee/RecommendedCourses";
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 function App() {
@@ -39,6 +41,7 @@ function App() {
         </Route>
         <Route path="*" element={<PageNotFound/>}/>
       </Routes>
+      <ToastContainer />
     </Router>
   )
 }

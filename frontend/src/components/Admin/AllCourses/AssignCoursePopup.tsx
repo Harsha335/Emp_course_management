@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { CourseType } from '.';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import axiosTokenInstance from '../../../api_calls/api_token_instance';
+import { toast } from 'react-toastify';
 
 type ParamsType = {
   course: CourseType;
@@ -51,13 +52,27 @@ const AssignCoursePopup: React.FC<ParamsType> = ({ course, removePopup }) => {
 
   const handleAssignCourse = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
+    const loadingToast = toast.loading("Assigning Courses...");
     try{
         // console.log(selectedEmpIds);
         const response = await axiosTokenInstance.post(`/api/courses/courseEmp/${course.course_id}`, {selectedEmpIds});
         console.log(response);
         removePopup();
+        toast.update(loadingToast, {
+          render: "Successfully Assigned Courses!",
+          type: "success",
+          isLoading: false,
+          autoClose: 2000, // automatically close after 2 seconds
+        });
     }catch(err){
         console.log("Error at handleAssignCourse: ",err);
+        toast.update(loadingToast, {
+          render: "Assigning Courses failed. Please try again.",
+          type: "error",
+          isLoading: false,
+          autoClose: 3000,
+        });
+  
     }
   }
 
