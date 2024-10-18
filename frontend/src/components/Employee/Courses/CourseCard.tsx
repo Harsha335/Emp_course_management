@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 // import { RibbonContainer,  Ribbon } from "react-ribbons";
 import { AssignedCourseType } from '.';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -53,12 +53,30 @@ const CourseCard: React.FC<CourseCardProps> = ({assignedCourse, onClickTakeTest,
     if (percentage <= 80) return 'bg-blue-500'; // Blue for good progress
     return 'bg-green-500'; // Green for high progress
   };
+  const [isLoaded, setIsLoaded] = useState(false);
   return (
     // <RibbonContainer>
         <div className="w-80 rounded-lg shadow-lg bg-white relative flex flex-col cursor-pointer transform hover:scale-105 transition-transform duration-300
 ">
             {/* Course Image */}
-            <img src={assignedCourse.course.course_img_url} alt={assignedCourse.course.course_name} className="h-48 object-cover" />
+            <div className="h-48">
+              {/* Loading spinner */}
+              {!isLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-100 animate-pulse">
+                  <div className="w-full h-full"></div>
+                </div>
+              )}
+              
+              {/* Image */}
+              <img
+                src={assignedCourse.course.course_img_url}
+                alt={assignedCourse.course.course_name}
+                className={`h-full w-full object-cover transition-opacity duration-500 ease-in-out ${
+                  isLoaded ? "opacity-100" : "opacity-0"
+                }`}
+                onLoad={() => setIsLoaded(true)}
+              />
+          </div>
             {/* <Ribbon
                 side="right"
                 type="edge"
