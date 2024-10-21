@@ -7,7 +7,7 @@ import pandas as pd
 app = Flask(__name__)
 
 # Load the pre-trained KNN model
-model = joblib.load('rf_learning_path_model.pkl')
+model = joblib.load('knn_learning_path_model.pkl') # rf_learning_path_model
 
 # Define a route for the prediction API
 @app.route('/predict', methods=['POST'])
@@ -63,20 +63,22 @@ def predict():
         # Fill NaN values with 0 (if there are any missing values after the pivot)
         pivot_df.fillna(0, inplace=True)
         
-        file_path = './rf_predicted_best_learning_paths.csv'  # Update with your actual file path
+        file_path = './knn_predicted_best_learning_paths.csv'  # Update with your actual file path
         df = pd.read_csv(file_path)
         # Fetch the column names from the DataFrame
         required_combined_scores = df.columns[df.columns.str.contains('combined_score_')].tolist()
         # print(required_combined_scores)
         # Create an empty DataFrame for input data with the required combined score columns
         input_data = pd.DataFrame(columns=required_combined_scores)
-
+        # print("pivot_df: ",pivot_df)
         # Assign values from pivot_df to input_data
         for col in required_combined_scores:
-            if col in pivot_df.columns:
+            if (col in pivot_df.columns):
                 input_data[col] = pivot_df[col]
             else:
                 input_data[col] = 0  # Fill with 0 if column is missing
+        input_data.fillna(0, inplace=True)
+        # print("input_data: ",input_data)
         # Predict the learning path using the pre-trained model
         prediction = model.predict(input_data)
         # print('prediction: ',prediction)

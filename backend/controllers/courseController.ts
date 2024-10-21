@@ -226,7 +226,7 @@ export const assignedCoursesDetails = async (req: CustomRequest, res: Response) 
           take: 1,
         }));
         isTestAccessed = records.length === 0;
-        console.log(course.enroll_id,records,records.length)
+        // console.log(course.enroll_id,records,records.length)
       }
 
       return {
@@ -767,7 +767,7 @@ export const getPredictedLearningPath = async (req: CustomRequest, res: Response
         return acc;
       }, { total_attempts: 0, accepted_attempts: 0 });
 
-      const success_rate = accepted_attempts / total_attempts;
+      const success_rate = accepted_attempts / total_attempts || 0;
 
       // Get the learning path ID from the course
       const learning_path_ids = enrollment.course.LearningPathMap.map(path => path.learning_path_id) || null;
@@ -781,7 +781,7 @@ export const getPredictedLearningPath = async (req: CustomRequest, res: Response
         success_rate
       };
     });
-
+    // console.log(cleaned_course_enrollment_data);
     // Send the cleaned data to Flask API for prediction
     const response = await axios.post(`${process.env.FLASK_SERVER}/predict`, cleaned_course_enrollment_data);
     const predicted_learning_path_id = response.data.predicted_learning_path_id;

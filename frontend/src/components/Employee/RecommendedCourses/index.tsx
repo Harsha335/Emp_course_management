@@ -122,6 +122,7 @@ const RecommendedCourses = () => {
             await axiosTokenInstance.post('/api/courses/assignCourse',{
                 course_id
             });
+            setAssignedCourses(courses => courses?.filter(course => course.course_id !== course_id));
             toast.update(loadingToast, {
                 render: "Successfully course assigned!",
                 type: "success",

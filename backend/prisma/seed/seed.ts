@@ -56,7 +56,7 @@ async function main() {
       enroll_id: { gte: 100 },
     },
   });
-  await prisma.Prerequisites.deleteMany({
+  await prisma.prerequisites.deleteMany({
     where:{
       course_id: {gte: 100}
     }
@@ -141,10 +141,10 @@ async function main() {
     // Step 1: Clean up the string to remove unwanted characters
     const inputString = prerequisite.prerequisites.replace(/[\[\]_":]/g, ''); // Remove [, ], _, :, ", and spaces
     // Step 2: Split the string by commas to get individual number strings
-    let stringArray = inputString.split(',');
+    let stringArray : string[] = inputString.split(',');
     // Step 3: Convert the string array into an array of integers
     let intArray = stringArray.map(item => parseInt(item.trim(), 10));
-    await prisma.Prerequisites.create({
+    await prisma.prerequisites.create({
       data: {
         course_id: Number(prerequisite.course_id),
         prerequisite_courses: intArray
